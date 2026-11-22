@@ -44,6 +44,15 @@ jobs:
           test -f dist/creators/index.html
           test -f dist/campaigns/index.html
           test -f dist/login/index.html
+          test -f dist/for-brands/index.html
+          test -f dist/for-creators/index.html
+          test -f dist/what-is-ugc/index.html
+          grep -q 'توظيف صانع محتوى UGC عربي' dist/for-brands/index.html
+          grep -q 'فرص عمل UGC للمبدعين العرب' dist/for-creators/index.html
+          grep -q 'ما هو UGC' dist/what-is-ugc/index.html
+          grep -q 'https://ugcarabie.com/for-brands/' dist/sitemap.xml
+          grep -q 'https://ugcarabie.com/for-creators/' dist/sitemap.xml
+          grep -q 'https://ugcarabie.com/what-is-ugc/' dist/sitemap.xml
           grep -q 'rel="canonical"' dist/creators/index.html
           grep -q 'name="robots" content="noindex' dist/login/index.html
       - name: Configure Pages
