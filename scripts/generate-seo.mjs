@@ -6,6 +6,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
+import { seoPages } from '../src/lib/seoContent.js'
 
 const SITE = 'https://ugcarabie.com'
 const OUT = path.resolve('dist')
@@ -111,6 +112,27 @@ await page('/how-it-works',{
  body:'<h2>لصانع المحتوى</h2><p>سجّل، وأضف نبذة وروابط أعمالك، وانتظر اعتماد الملف، ثم تقدّم على الحملات المناسبة.</p><h2>للشركات</h2><p>سجّل شركتك، واكتشف المبدعين حسب تخصصهم وبلدهم، وانشر حملة وراجع طلبات التعاون.</p>',
  structured:{'@type':'AboutPage',name:'كيف تعمل منصة UGC Arabie؟',url:url('/how-it-works'),inLanguage:'ar'}
 })
+
+// Intent-led evergreen landing pages are rendered both for users and crawlers.
+for(const [pathname,content] of Object.entries(seoPages)){
+ const sections=content.sections.map(section=>
+  '<section><h2>'+esc(section.title)+'</h2>'+
+  (section.paragraphs||[]).map(p=>'<p>'+esc(p)+'</p>').join('')+
+  (section.items||[]).map(item=>'<div><h3>'+esc(item.heading)+'</h3><p>'+esc(item.text)+'</p></div>').join('')+
+  (section.bullets?.length?'<ul>'+section.bullets.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul>':'')+
+  (section.links?.length?list(section.links.map(x=>({href:x.href,title:x.label}))):'')+'</section>'
+ ).join('')
+ const questions='<section><h2>أسئلة شائعة</h2>'+content.faq.map(q=>'<div><h3>'+esc(q.question)+'</h3><p>'+esc(q.answer)+'</p></div>').join('')+'</section>'
+ const links=list([...content.actions,...content.related].map(x=>({href:x.href,title:x.label})))
+ await page(pathname,{
+  title:content.title,
+  description:content.description,
+  heading:content.heading,
+  body:'<p>'+esc(content.lead)+'</p>'+links+sections+questions,
+  structured:{'@type':'WebPage',url:url(pathname),name:content.title,description:content.description,inLanguage:'ar',
+    isPartOf:{'@id':website['@id']},about:org}
+ })
+}
 
 for(const c of creators){
  const p=c.profile
