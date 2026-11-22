@@ -2,11 +2,12 @@ import {useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import {supabase} from '../lib/supabase'
 import {seoPages} from '../lib/seoContent'
+import {homepageSeo} from '../lib/homeSeo'
 
 const SITE='https://ugcarabie.com'
 const org={'@type':'Organization',name:'UGC Arabie',url:SITE+'/'}
 const defaults={
- '/': ['صناع محتوى UGC عرب للشركات والعلامات التجارية | UGC Arabie','اكتشف صناع محتوى UGC عرب، تصفّح أعمالهم وتخصصاتهم، وانشر حملات تعاون لعلامتك التجارية. منصة UGC Arabie تجمع المبدعين بالشركات.','WebPage'],
+ '/': [homepageSeo.title,homepageSeo.description,'WebPage'],
  '/creators': ['صناع محتوى UGC عرب | اكتشف مبدعين لعلامتك التجارية | UGC Arabie','ابحث عن صناع محتوى UGC عرب حسب البلد والتخصص، واستعرض ملفاتهم وروابط أعمالهم لاختيار المبدع المناسب لحملتك الإعلانية.','CollectionPage'],
  '/campaigns': ['فرص عمل وحملات UGC للمبدعين العرب | UGC Arabie','تصفّح فرص وحملات إنشاء محتوى UGC للعلامات التجارية، واعرف التخصصات والميزانيات والمتطلبات، وقدّم على التعاون المناسب لك.','CollectionPage'],
  '/how-it-works': ['كيف تعمل منصة UGC Arabie؟ دليل المبدعين والشركات','دليل استخدام منصة UGC Arabie: إنشاء بروفايل صانع محتوى، الموافقة عليه، البحث عن الحملات، نشر حملات الشركات والتواصل بعد قبول الطلب.','AboutPage']
