@@ -26,7 +26,7 @@ try {
         if (exceptions.length) throw new Error('JavaScript error: ' + exceptions.join('; '));
         const app = await page.locator('#root').innerText();
         if (app.length < 300) throw new Error('React app rendered too little content: ' + app.length);
-        for (const route of ['register?role=creator', 'register?role=company', 'login', 'creators', 'campaigns']) {
+        for (const route of ['register?role=creator', 'register?role=company', 'login', 'creators', 'campaigns', 'for-brands', 'for-creators', 'what-is-ugc']) {
           const target = new URL(route, siteUrl).toString();
           const routeResponse = await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (routeResponse?.status() !== 200) throw new Error('SEO route ' + route + ' must return HTTP 200, got ' + routeResponse?.status());
@@ -36,6 +36,12 @@ try {
         const homepage = await page.request.get(siteUrl);
         const homepageHtml = await homepage.text();
         if (homepage.status() !== 200 || !homepageHtml.includes('rel="canonical"')) throw new Error('Home SEO prerender missing');
+        for (const slug of ['for-brands','for-creators','what-is-ugc']) {
+          const res = await page.request.get(new URL('/'+slug+'/',siteUrl).toString());
+          const html = await res.text();
+          if (res.status() !== 200 || !html.includes('rel="canonical"') || !html.includes('application/ld+json')) throw new Error('SEO '+slug+' metadata or HTTP 200 missing');
+          if (!html.includes('<h2>') || !html.includes('أسئلة شائعة')) throw new Error('SEO '+slug+' body not prerendered');
+        }
         const sitemap = await page.request.get(new URL('/sitemap.xml',siteUrl).toString());
         if (sitemap.status() !== 200 || !(await sitemap.text()).includes('<urlset')) throw new Error('SEO sitemap unavailable');
         const robots = await page.request.get(new URL('/robots.txt',siteUrl).toString());
