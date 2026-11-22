@@ -22,7 +22,7 @@ try {
         if (response?.status() !== 200) throw new Error('HTTP ' + response?.status());
         await page.locator('h1').first().waitFor({ state: 'visible', timeout: 12000 });
         const heading = await page.locator('h1').first().innerText();
-        if (!heading.includes('محتواك اليوم')) throw new Error('Unexpected heading: ' + heading);
+        if (!heading.includes('صناع محتوى UGC عرب')) throw new Error('Unexpected heading: ' + heading);
         if (exceptions.length) throw new Error('JavaScript error: ' + exceptions.join('; '));
         const app = await page.locator('#root').innerText();
         if (app.length < 300) throw new Error('React app rendered too little content: ' + app.length);
