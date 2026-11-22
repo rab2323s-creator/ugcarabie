@@ -1,6 +1,7 @@
 import {useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import {supabase} from '../lib/supabase'
+import {seoPages} from '../lib/seoContent'
 
 const SITE='https://ugcarabie.com'
 const org={'@type':'Organization',name:'UGC Arabie',url:SITE+'/'}
@@ -58,6 +59,11 @@ export default function SeoHead(){
   const common=defaults[path]
   if(common){
    apply(path,{title:common[0],description:common[1],structured:{'@type':common[2],name:common[0],url:canonical(path),inLanguage:'ar'}})
+   return()=>{active=false}
+  }
+  if(seoPages[path]){
+   const entry=seoPages[path]
+   apply(path,{title:entry.title,description:entry.description,structured:{'@type':'WebPage',name:entry.title,url:canonical(path),description:entry.description,inLanguage:'ar'}})
    return()=>{active=false}
   }
   if(privateTitles[path]){
