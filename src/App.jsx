@@ -1,6 +1,7 @@
 import React,{useEffect} from 'react'
 import {Routes,Route,useLocation} from 'react-router-dom'
 import {PageLayout} from './components/Layout'
+import SeoHead from './components/SeoHead'
 import Home from './pages/Home'
 import {Creators,CreatorDetails,Campaigns,CampaignDetails} from './pages/Explore'
 import {AuthPage} from './pages/AuthPages'
@@ -11,7 +12,7 @@ import Admin from './pages/Admin'
 import {HowItWorks,Legal,NotFound} from './pages/Static'
 
 function ScrollToTop(){const {pathname}=useLocation();useEffect(()=>{window.scrollTo({top:0,behavior:'instant'})},[pathname]);return null}
-export default function App(){return <PageLayout><ScrollToTop/><Routes>
+export default function App(){return <PageLayout><ScrollToTop/><SeoHead/><Routes>
  <Route path="/" element={<Home/>}/>
  <Route path="/creators" element={<Creators/>}/>
  <Route path="/creator/:slug" element={<CreatorDetails/>}/>
