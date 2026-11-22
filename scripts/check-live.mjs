@@ -29,10 +29,19 @@ try {
         for (const route of ['register?role=creator', 'register?role=company', 'login', 'creators', 'campaigns']) {
           const target = new URL(route, siteUrl).toString();
           const routeResponse = await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30000 });
-          if (!routeResponse || ![200, 404].includes(routeResponse.status())) throw new Error('Route ' + route + ' HTTP ' + routeResponse?.status());
+          if (routeResponse?.status() !== 200) throw new Error('SEO route ' + route + ' must return HTTP 200, got ' + routeResponse?.status());
           await page.locator('#root').locator('h1').first().waitFor({ state: 'visible', timeout: 12000 });
           if (exceptions.length) throw new Error('JS error on ' + route + ': ' + exceptions.join('; '));
         }
+        const homepage = await page.request.get(siteUrl);
+        const homepageHtml = await homepage.text();
+        if (homepage.status() !== 200 || !homepageHtml.includes('rel="canonical"')) throw new Error('Home SEO prerender missing');
+        const sitemap = await page.request.get(new URL('/sitemap.xml',siteUrl).toString());
+        if (sitemap.status() !== 200 || !(await sitemap.text()).includes('<urlset')) throw new Error('SEO sitemap unavailable');
+        const robots = await page.request.get(new URL('/robots.txt',siteUrl).toString());
+        if (robots.status() !== 200 || !(await robots.text()).includes('Sitemap:')) throw new Error('SEO robots unavailable');
+        const privateSeo = await page.request.get(new URL('/login/',siteUrl).toString());
+        if (privateSeo.status() !== 200 || !(await privateSeo.text()).includes('content="noindex,follow"')) throw new Error('Private route noindex missing');
         await page.goto(siteUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
         await page.locator('h1').first().waitFor({ state: 'visible', timeout: 12000 });
         await page.screenshot({ path: 'screenshots/' + test.name + '.png', fullPage: false });
