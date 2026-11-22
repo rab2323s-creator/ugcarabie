@@ -7,6 +7,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 import { seoPages } from '../src/lib/seoContent.js'
+import { homepageSeo } from '../src/lib/homeSeo.js'
 
 const SITE = 'https://ugcarabie.com'
 const OUT = path.resolve('dist')
@@ -84,9 +85,9 @@ function page(pathname, options={}){
 }
 
 await page('/',{
- title:'صناع محتوى UGC عرب للشركات والعلامات التجارية | UGC Arabie',
- description:'اكتشف صناع محتوى UGC عرب، تصفّح أعمالهم وتخصصاتهم، وانشر حملات تعاون لعلامتك التجارية. منصة UGC Arabie تجمع المبدعين بالشركات.',
- heading:'منصة صناع محتوى UGC العرب للشركات والعلامات التجارية',
+ title:homepageSeo.title,
+ description:homepageSeo.description,
+ heading:homepageSeo.heading,
  body:'<h2>ابحث عن مبدعين وفرص UGC</h2>'+list([{href:'/creators/',title:'اكتشف صناع محتوى UGC عرب'},{href:'/campaigns/',title:'تصفح حملات وفرص UGC'},{href:'/how-it-works/',title:'كيف تعمل المنصة؟'}]),
  structured:{'@type':'WebPage','@id':SITE+'/#home',name:'UGC Arabie — منصة صناع محتوى UGC العرب',url:SITE+'/',inLanguage:'ar',isPartOf:{'@id':website['@id']},about:org}
 })
