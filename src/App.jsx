@@ -6,6 +6,7 @@ import {Creators,CreatorDetails,Campaigns,CampaignDetails} from './pages/Explore
 import {AuthPage} from './pages/AuthPages'
 import {Protected,DashboardHome,ProfileEditor,NewCampaign} from './pages/Dashboard'
 import {Messages} from './pages/Messages'
+import SupportMessages from './pages/SupportMessages'
 import Admin from './pages/Admin'
 import {HowItWorks,Legal,NotFound} from './pages/Static'
 
@@ -22,6 +23,7 @@ export default function App(){return <PageLayout><ScrollToTop/><Routes>
  <Route path="/dashboard/profile" element={<Protected><ProfileEditor/></Protected>}/>
  <Route path="/dashboard/campaigns/new" element={<Protected roles={['company']}><NewCampaign/></Protected>}/>
  <Route path="/messages" element={<Protected><Messages/></Protected>}/>
+ <Route path="/support" element={<Protected roles={['admin','creator']}><SupportMessages/></Protected>}/>
  <Route path="/admin" element={<Protected roles={['admin']}><Admin/></Protected>}/>
  <Route path="/how-it-works" element={<HowItWorks/>}/>
  <Route path="/terms" element={<Legal type="terms"/>}/>
