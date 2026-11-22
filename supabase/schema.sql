@@ -307,11 +307,19 @@ for insert to authenticated with check (
   (c.recipient_id=(select auth.uid()) or (c.admin_id=(select auth.uid()) and (select public.is_admin())))
  )
 );
+-- Use a non-exposed privileged helper to avoid mutually recursive RLS evaluation.
+create or replace function app_private.is_support_counterpart(target_id uuid)
+returns boolean language sql stable security definer set search_path = ''
+as $ select (select auth.uid()) is not null and exists(
+ select 1 from public.support_conversations sc where
+ (sc.recipient_id=target_id and sc.admin_id=(select auth.uid()))
+ or (sc.admin_id=target_id and sc.recipient_id=(select auth.uid()))
+) $;
+revoke all on function app_private.is_support_counterpart(uuid) from public, anon, authenticated;
+grant execute on function app_private.is_support_counterpart(uuid) to authenticated, service_role;
 create policy "support participants see counterpart identity" on public.profiles
 for select to authenticated using (
- exists(select 1 from public.support_conversations sc where
-  (sc.recipient_id=profiles.id and sc.admin_id=(select auth.uid()))
-  or (sc.admin_id=profiles.id and sc.recipient_id=(select auth.uid())))
+ (select app_private.is_support_counterpart(profiles.id))
 );
 
 -- Avatar upload path must start with the authenticated user's UUID.
