@@ -256,6 +256,10 @@ create policy "users remove own avatars" on storage.objects for delete to authen
 -- Realtime chat (the SQL script is intended to run once in a new Supabase project).
 alter publication supabase_realtime add table public.messages;
 
+-- Internal trigger functions must not be callable through the public Data API.
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+revoke execute on function public.enforce_portfolio_limit() from public, anon, authenticated;
+
 -- After creating your own account, grant admin via SQL Editor only:
 -- update public.profiles set role='admin' where id = 'YOUR_USER_UUID';
 -- Note: admin is a separate role; create a distinct staff account rather than
