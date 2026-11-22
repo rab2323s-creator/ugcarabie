@@ -34,8 +34,15 @@ jobs:
           VITE_SUPABASE_URL: 'https://nnhcnkatljjpjnxupltq.supabase.co'
           VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_9XoNMg-ZUM7rGpmIcU_7BA_nONo7UeI'
         run: npm run build
-      - name: Allow direct URLs to render React routes
-        run: cp dist/index.html dist/404.html
+      - name: Verify generated SEO index and route pages
+        run: |
+          test -f dist/sitemap.xml
+          test -f dist/robots.txt
+          test -f dist/creators/index.html
+          test -f dist/campaigns/index.html
+          test -f dist/login/index.html
+          grep -q 'rel="canonical"' dist/creators/index.html
+          grep -q 'name="robots" content="noindex' dist/login/index.html
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
