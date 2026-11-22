@@ -11,33 +11,33 @@ export default function SupportMessages(){
  const [threads,setThreads]=useState([]),[people,setPeople]=useState({}),[messages,setMessages]=useState([])
  const [draft,setDraft]=useState(''),[loading,setLoading]=useState(true),[sending,setSending]=useState(false)
  const [opening,setOpening]=useState(false),endRef=useRef(null)
- const requestedCreator=params.get('creator')
+ const requestedRecipient=params.get('recipient')||params.get('creator')
  const activeId=params.get('chat')||threads[0]?.id
  async function loadThreads(){
   if(!user)return
-  const {data,error}=await supabase.from('support_conversations').select('id,admin_id,creator_id,created_at').order('created_at',{ascending:false})
+  const {data,error}=await supabase.from('support_conversations').select('id,admin_id,recipient_id,created_at').order('created_at',{ascending:false})
   if(error){toast(error.message);setLoading(false);return}
   const arr=data||[];setThreads(arr)
-  const ids=[...new Set(arr.flatMap(t=>[t.admin_id,t.creator_id]))]
+  const ids=[...new Set(arr.flatMap(t=>[t.admin_id,t.recipient_id]))]
   if(ids.length){const {data:p}=await supabase.from('profiles').select('id,display_name').in('id',ids);setPeople(Object.fromEntries((p||[]).map(x=>[x.id,x])))}
   setLoading(false)
  }
  useEffect(()=>{loadThreads()},[user?.id])
  useEffect(()=>{
-  if(!user||profile?.role!=='admin'||!requestedCreator||opening)return
-  // Opening support threads is explicitly initiated by the admin clicking a creator's button.
+  if(!user||profile?.role!=='admin'||!requestedRecipient||opening)return
+  // Open only the recipient selected from an admin action.
   let cancelled=false
   async function openThread(){
    setOpening(true)
-   const {data:existing,error:findError}=await supabase.from('support_conversations').select('id').eq('admin_id',user.id).eq('creator_id',requestedCreator).maybeSingle()
+   const {data:existing,error:findError}=await supabase.from('support_conversations').select('id').eq('admin_id',user.id).eq('recipient_id',requestedRecipient).maybeSingle()
    if(cancelled)return
    if(findError){toast(findError.message);setOpening(false);return}
    let id=existing?.id
    if(!id){
-    const {data,error}=await supabase.from('support_conversations').insert({admin_id:user.id,creator_id:requestedCreator}).select('id').single()
+    const {data,error}=await supabase.from('support_conversations').insert({admin_id:user.id,recipient_id:requestedRecipient}).select('id').single()
     if(cancelled)return
     if(error?.code==='23505'){
-     const {data:existingNow,error:lookupError}=await supabase.from('support_conversations').select('id').eq('admin_id',user.id).eq('creator_id',requestedCreator).single()
+     const {data:existingNow,error:lookupError}=await supabase.from('support_conversations').select('id').eq('admin_id',user.id).eq('recipient_id',requestedRecipient).single()
      if(cancelled)return
      if(lookupError){toast(lookupError.message);setOpening(false);return}
      id=existingNow.id
@@ -50,7 +50,7 @@ export default function SupportMessages(){
   }
   openThread()
   return()=>{cancelled=true}
- },[requestedCreator,user?.id,profile?.role])
+ },[requestedRecipient,user?.id,profile?.role])
  useEffect(()=>{
   setMessages([])
   if(!activeId||!threads.some(t=>t.id===activeId))return
@@ -74,8 +74,8 @@ export default function SupportMessages(){
   setMessages(prev=>prev.some(m=>m.id===data.id)?prev:[...prev,data])
  }
  const current=threads.find(t=>t.id===activeId)
- const partner=t=>t.admin_id===user?.id?t.creator_id:t.admin_id
- return <DashShell title="مراسلات الإدارة" description="قناة خاصة بين إدارة المنصة وصنّاع المحتوى، منفصلة عن محادثات الحملات.">
+ const partner=t=>t.admin_id===user?.id?t.recipient_id:t.admin_id
+ return <DashShell title="مراسلات الإدارة" description="قناة خاصة بين إدارة المنصة وصنّاع المحتوى والشركات، منفصلة عن محادثات الحملات.">
   <div className="messaging-shell">
    <aside className="chat-list"><h2>مراسلات الإدارة <span>{threads.length}</span></h2>
     {loading||opening?<Loading/>:threads.length?threads.map(t=><button key={t.id} className={'chat-list-item '+(activeId===t.id?'selected':'')} onClick={()=>setParams({chat:t.id})}>
