@@ -29,9 +29,8 @@ jobs:
           node-version: '22'
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-      - name: Build site for subpath /ugcarabie/
+      - name: Build site for ugcarabie.com
         env:
-          GITHUB_PAGES: 'true'
           VITE_SUPABASE_URL: 'https://nnhcnkatljjpjnxupltq.supabase.co'
           VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_9XoNMg-ZUM7rGpmIcU_7BA_nONo7UeI'
         run: npm run build
@@ -51,7 +50,7 @@ jobs:
           npm install --no-save playwright@1.56.1
           npx playwright install chromium --with-deps
       - name: Verify published site on desktop and mobile
-        run: node scripts/check-live.mjs "${{ steps.deployment.outputs.page_url }}"
+        run: node scripts/check-live.mjs "https://ugcarabie.com/"
       - name: Save browser screenshots
         if: always()
         uses: actions/upload-artifact@v4

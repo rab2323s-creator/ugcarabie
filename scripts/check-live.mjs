@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs/promises';
 
-const siteUrl = process.argv[2] || 'https://rab2323s-creator.github.io/ugcarabie/';
+const siteUrl = process.argv[2] || 'https://ugcarabie.com/';
 if (!siteUrl.startsWith('https://')) throw new Error('Expected HTTPS preview URL');
 await fs.mkdir('screenshots', { recursive: true });
 
@@ -26,6 +26,15 @@ try {
         if (exceptions.length) throw new Error('JavaScript error: ' + exceptions.join('; '));
         const app = await page.locator('#root').innerText();
         if (app.length < 300) throw new Error('React app rendered too little content: ' + app.length);
+        for (const route of ['register?role=creator', 'register?role=company', 'login', 'creators', 'campaigns']) {
+          const target = new URL(route, siteUrl).toString();
+          const routeResponse = await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30000 });
+          if (!routeResponse || ![200, 404].includes(routeResponse.status())) throw new Error('Route ' + route + ' HTTP ' + routeResponse?.status());
+          await page.locator('#root').locator('h1').first().waitFor({ state: 'visible', timeout: 12000 });
+          if (exceptions.length) throw new Error('JS error on ' + route + ': ' + exceptions.join('; '));
+        }
+        await page.goto(siteUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await page.locator('h1').first().waitFor({ state: 'visible', timeout: 12000 });
         await page.screenshot({ path: 'screenshots/' + test.name + '.png', fullPage: false });
         console.log(test.name + ': PASS, HTTP 200, heading and React content visible');
         passed = true;

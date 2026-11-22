@@ -35,7 +35,7 @@ A responsive, right-to-left React platform for Arab UGC creators and businesses.
 9. Create a separate staff account and promote it to `admin` using Supabase SQL Editor with its exact `auth.users.id`, e.g. `update public.profiles set role='admin' where id='UUID';` (do not paste any private API keys in chat).
 10. Before inviting the public, finish legal documents, privacy/deletion flow, moderation tools, transactional email branding and real-device testing.
 
-**Preview mode:** GitHub Pages builds with the public Supabase URL and publishable key. With no approved creators or published campaigns, directories display clearly marked, non-clickable demo cards. Login and signup use the real Supabase project. For email verification, configure the Site URL and allowed redirect URL in Supabase Auth to include https://rab2323s-creator.github.io/ugcarabie/. The public URL and publishable key are not secret credentials; never put a secret/service_role key in client code.
+**Production domain:** GitHub Pages builds at `https://ugcarabie.com/` using Vite `base: '/'`, with the public Supabase URL and publishable key. With no approved creators or published campaigns, directories display clearly marked, non-clickable demo cards. Login and signup use the real Supabase project. For email verification, configure the Site URL and allowed redirect URL in Supabase Auth to include https://ugcarabie.com/ (and optionally https://www.ugcarabie.com/). The public URL and publishable key are not secret credentials; never put a secret/service_role key in client code.
 
 ### Commands (optional if using a browser-based dev environment)
 
