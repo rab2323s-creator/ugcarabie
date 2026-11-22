@@ -2,6 +2,7 @@ import React,{useEffect} from 'react'
 import {Routes,Route,useLocation} from 'react-router-dom'
 import {PageLayout} from './components/Layout'
 import SeoHead from './components/SeoHead'
+import SearchLanding from './pages/SearchLanding'
 import Home from './pages/Home'
 import {Creators,CreatorDetails,Campaigns,CampaignDetails} from './pages/Explore'
 import {AuthPage} from './pages/AuthPages'
@@ -27,6 +28,9 @@ export default function App(){return <PageLayout><ScrollToTop/><SeoHead/><Routes
  <Route path="/support" element={<Protected roles={['admin','creator','company']}><SupportMessages/></Protected>}/>
  <Route path="/admin" element={<Protected roles={['admin']}><Admin/></Protected>}/>
  <Route path="/how-it-works" element={<HowItWorks/>}/>
+ <Route path="/for-brands" element={<SearchLanding/>}/>
+ <Route path="/for-creators" element={<SearchLanding/>}/>
+ <Route path="/what-is-ugc" element={<SearchLanding/>}/>
  <Route path="/terms" element={<Legal type="terms"/>}/>
  <Route path="/privacy" element={<Legal type="privacy"/>}/>
  <Route path="*" element={<NotFound/>}/>
