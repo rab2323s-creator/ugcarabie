@@ -263,14 +263,14 @@ create policy "conversation participants send" on public.messages for insert to 
  sender_id=(select auth.uid()) and exists(select 1 from public.conversations c where c.id=conversation_id and (c.creator_id=(select auth.uid()) or c.company_id=(select auth.uid())))
 );
 
--- Administrator-to-creator support is separate from company/campaign messages.
+-- Administrator-to-member support is separate from company/campaign messages.
 create table public.support_conversations (
  id uuid primary key default gen_random_uuid(),
  admin_id uuid not null references public.profiles(id) on delete cascade,
- creator_id uuid not null references public.creator_profiles(user_id) on delete cascade,
+ recipient_id uuid not null references public.profiles(id) on delete cascade,
  created_at timestamptz not null default now(),
- unique(admin_id,creator_id),
- check(admin_id <> creator_id)
+ unique(admin_id,recipient_id),
+ check(admin_id <> recipient_id)
 );
 create table public.support_messages (
  id uuid primary key default gen_random_uuid(),
@@ -279,7 +279,7 @@ create table public.support_messages (
  body text not null check(char_length(body) between 1 and 5000),
  created_at timestamptz not null default now()
 );
-create index idx_support_conversations_creator on public.support_conversations(creator_id,created_at desc);
+create index idx_support_conversations_creator on public.support_conversations(recipient_id,created_at desc);
 create index idx_support_messages_thread on public.support_messages(conversation_id,created_at);
 alter table public.support_conversations enable row level security;
 alter table public.support_messages enable row level security;
@@ -289,12 +289,12 @@ grant all on public.support_conversations,public.support_messages to service_rol
 create policy "support thread participants read" on public.support_conversations
 for select to authenticated using (
  (admin_id = (select auth.uid()) and (select public.is_admin()))
- or creator_id = (select auth.uid())
+ or recipient_id = (select auth.uid())
 );
-create policy "admin opens creator support thread" on public.support_conversations
+create policy "admin opens member support thread" on public.support_conversations
 for insert to authenticated with check (
  admin_id = (select auth.uid()) and (select public.is_admin())
- and exists(select 1 from public.profiles p where p.id=creator_id and p.role='creator')
+ and exists(select 1 from public.profiles p where p.id=recipient_id and p.role in ('creator','company'))
 );
 create policy "support participants read messages" on public.support_messages
 for select to authenticated using (
@@ -304,14 +304,14 @@ create policy "support participants send messages" on public.support_messages
 for insert to authenticated with check (
  sender_id = (select auth.uid())
  and exists(select 1 from public.support_conversations c where c.id=conversation_id and
-  (c.creator_id=(select auth.uid()) or (c.admin_id=(select auth.uid()) and (select public.is_admin())))
+  (c.recipient_id=(select auth.uid()) or (c.admin_id=(select auth.uid()) and (select public.is_admin())))
  )
 );
 create policy "support participants see counterpart identity" on public.profiles
 for select to authenticated using (
  exists(select 1 from public.support_conversations sc where
-  (sc.creator_id=profiles.id and sc.admin_id=(select auth.uid()))
-  or (sc.admin_id=profiles.id and sc.creator_id=(select auth.uid())))
+  (sc.recipient_id=profiles.id and sc.admin_id=(select auth.uid()))
+  or (sc.admin_id=profiles.id and sc.recipient_id=(select auth.uid())))
 );
 
 -- Avatar upload path must start with the authenticated user's UUID.
