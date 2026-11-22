@@ -93,12 +93,24 @@ create index idx_conversations_creator on public.conversations(creator_id);
 create index idx_conversations_company on public.conversations(company_id);
 create index idx_messages_thread on public.messages(conversation_id,created_at);
 
-create or replace function public.current_role()
+create schema if not exists app_private;
+revoke all on schema app_private from public;
+grant usage on schema app_private to anon, authenticated, service_role;
+create or replace function app_private.current_role()
 returns text language sql stable security definer set search_path = ''
-as $$ select role from public.profiles where id = (select auth.uid()) $$;
-create or replace function public.is_admin()
+as $ select role from public.profiles where id = (select auth.uid()) $;
+create or replace function app_private.is_admin()
 returns boolean language sql stable security definer set search_path = ''
-as $$ select coalesce((select role = 'admin' from public.profiles where id = (select auth.uid())), false) $$;
+as $ select coalesce((select role = 'admin' from public.profiles where id = (select auth.uid())), false) $;
+revoke all on function app_private.current_role() from public, anon, authenticated;
+revoke all on function app_private.is_admin() from public, anon, authenticated;
+grant execute on function app_private.current_role(), app_private.is_admin() to anon, authenticated, service_role;
+create or replace function public.current_role()
+returns text language sql stable security invoker set search_path = ''
+as $ select app_private.current_role() $;
+create or replace function public.is_admin()
+returns boolean language sql stable security invoker set search_path = ''
+as $ select app_private.is_admin() $;
 
 create or replace function public.set_updated_at()
 returns trigger language plpgsql set search_path = ''
@@ -158,7 +170,16 @@ alter table public.conversations enable row level security;
 alter table public.messages enable row level security;
 
 -- Public profiles intentionally contain no email addresses.
-create policy "public profile read" on public.profiles for select using (true);
+create policy "public profile read" on public.profiles for select using (
+ id = (select auth.uid()) or (select public.is_admin()) or role = 'company'
+ or (role = 'creator' and exists (
+  select 1 from public.creator_profiles cp where cp.user_id = profiles.id and cp.approved
+ ))
+ or exists (select 1 from public.conversations c where
+  (c.creator_id = profiles.id and c.company_id = (select auth.uid()))
+  or (c.company_id = profiles.id and c.creator_id = (select auth.uid()))
+ )
+);
 create policy "owner profile edit" on public.profiles for update to authenticated using (id = (select auth.uid()) or public.is_admin()) with check (id = (select auth.uid()) or public.is_admin());
 
 create policy "approved creator read" on public.creator_profiles for select using (approved = true or user_id = (select auth.uid()) or public.is_admin());
@@ -245,7 +266,10 @@ create policy "conversation participants send" on public.messages for insert to 
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
 values('avatars','avatars',true,102400,array['image/jpeg','image/png','image/webp'])
 on conflict (id) do update set file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
-create policy "avatars can be viewed publicly" on storage.objects for select using (bucket_id='avatars');
+create policy "users can inspect their own avatar metadata" on storage.objects
+for select to authenticated using (
+ bucket_id='avatars' and (storage.foldername(name))[1]=(select auth.uid())::text
+);
 create policy "users upload into own avatar folder" on storage.objects for insert to authenticated with check (
  bucket_id='avatars' and (storage.foldername(name))[1]=(select auth.uid())::text
 );
