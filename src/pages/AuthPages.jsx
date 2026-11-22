@@ -11,7 +11,7 @@ export function AuthPage({type}){
  if(password.length<8){toast('كلمة المرور لازم تكون 8 أحرف على الأقل.');return}
  setBusy(true)
  let result
- if(signup)result=await supabase.auth.signUp({email:email.trim(),password,options:{data:{display_name:name.trim(),role},emailRedirectTo:window.location.origin+'/dashboard'}})
+ if(signup)result=await supabase.auth.signUp({email:email.trim(),password,options:{data:{display_name:name.trim(),role},emailRedirectTo:new URL(import.meta.env.BASE_URL,window.location.origin).toString()}})
  else result=await supabase.auth.signInWithPassword({email:email.trim(),password})
  setBusy(false)
  if(result.error){toast(result.error.message);return}

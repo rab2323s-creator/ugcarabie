@@ -19,4 +19,4 @@ export function PageLayout({children}){return <><a className="skip-link" href="#
 export function SectionHeading({eyebrow,title,description,action}){return <div className="section-heading"><div><div className="eyebrow"><Sparkles size={15}/> {eyebrow}</div><h2>{title}</h2>{description&&<p>{description}</p>}</div>{action&&<div className="section-action">{action}</div>}</div>}
 export function EmptyState({title='ما في نتائج حالياً',description='جرّب تغيير البحث أو ارجع لاحقاً.',action}){return <div className="empty-state"><div className="empty-illustration"><Sparkles size={34}/></div><h3>{title}</h3><p>{description}</p>{action}</div>}
 export function Loading(){return <div className="loading" aria-label="جاري التحميل"><div className="spinner"/> جاري التحميل...</div>}
-export function DemoNotice(){return <div className="demo-notice">هذه بطاقات توضيحية للتصميم، وليست حسابات أو حملات حقيقية. ستظهر البيانات الفعلية بعد ربط قاعدة البيانات.</div>}
+export function DemoNotice(){return <div className="demo-notice">هذه أمثلة توضيحية للتصميم وليست حسابات مبدعين أو حملات حقيقية. ستظهر البيانات الفعلية بعد التسجيل واعتماد الحسابات أو نشر الحملات.</div>}

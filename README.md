@@ -25,7 +25,7 @@ A responsive, right-to-left React platform for Arab UGC creators and businesses.
 5. Copy **Project URL** and **publishable/anon key** from Supabase API settings. **Never share the service_role key or database password.**
 6. Create project environment variables (via the host control panel or `.env` locally):
    - `VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co`
-   - `VITE_SUPABASE_ANON_KEY=YOUR_PUBLISHABLE_OR_ANON_KEY`
+   - `VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY`
 7. Deploy on [Cloudflare Pages](https://dash.cloudflare.com/) by connecting GitHub; set:
    - Build command: `npm run build`
    - Build output: `dist`
@@ -35,7 +35,7 @@ A responsive, right-to-left React platform for Arab UGC creators and businesses.
 9. Create a separate staff account and promote it to `admin` using Supabase SQL Editor with its exact `auth.users.id`, e.g. `update public.profiles set role='admin' where id='UUID';` (do not paste any private API keys in chat).
 10. Before inviting the public, finish legal documents, privacy/deletion flow, moderation tools, transactional email branding and real-device testing.
 
-**Demo mode:** Without the two Supabase environment variables, public directories show clearly marked mock creator/campaign entries. Sign-up and business logic are disabled until the backend is configured. Demo content is NOT real users or offers.
+**Preview mode:** GitHub Pages builds with the public Supabase URL and publishable key. With no approved creators or published campaigns, directories display clearly marked, non-clickable demo cards. Login and signup use the real Supabase project. For email verification, configure the Site URL and allowed redirect URL in Supabase Auth to include https://rab2323s-creator.github.io/ugcarabie/. The public URL and publishable key are not secret credentials; never put a secret/service_role key in client code.
 
 ### Commands (optional if using a browser-based dev environment)
 

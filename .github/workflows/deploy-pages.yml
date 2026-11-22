@@ -32,6 +32,8 @@ jobs:
       - name: Build site for subpath /ugcarabie/
         env:
           GITHUB_PAGES: 'true'
+          VITE_SUPABASE_URL: 'https://nnhcnkatljjpjnxupltq.supabase.co'
+          VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_9XoNMg-ZUM7rGpmIcU_7BA_nONo7UeI'
         run: npm run build
       - name: Allow direct URLs to render React routes
         run: cp dist/index.html dist/404.html
