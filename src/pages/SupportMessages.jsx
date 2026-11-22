@@ -34,10 +34,15 @@ export default function SupportMessages(){
    if(findError){toast(findError.message);setOpening(false);return}
    let id=existing?.id
    if(!id){
-    const {data, error}=await supabase.from('support_conversations').upsert({admin_id:user.id,creator_id:requestedCreator},{onConflict:'admin_id,creator_id'}).select('id').single()
+    const {data,error}=await supabase.from('support_conversations').insert({admin_id:user.id,creator_id:requestedCreator}).select('id').single()
     if(cancelled)return
-    if(error){toast(error.message);setOpening(false);return}
-    id=data.id
+    if(error?.code==='23505'){
+     const {data:existingNow,error:lookupError}=await supabase.from('support_conversations').select('id').eq('admin_id',user.id).eq('creator_id',requestedCreator).single()
+     if(cancelled)return
+     if(lookupError){toast(lookupError.message);setOpening(false);return}
+     id=existingNow.id
+    }else if(error){toast(error.message);setOpening(false);return}
+    else id=data.id
    }
    setParams({chat:id},{replace:true})
    await loadThreads()
