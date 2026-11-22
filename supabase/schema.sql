@@ -210,16 +210,17 @@ returns trigger language plpgsql set search_path = ''
 as $$
 begin
  if (select auth.uid()) is not null then
-   if tg_table_name = 'conversations' and
-      (new.company_id is distinct from old.company_id or
-       new.creator_id is distinct from old.creator_id or
-       new.campaign_id is distinct from old.campaign_id) then
+   if tg_table_name = 'conversations' then
+     if new.company_id is distinct from old.company_id
+       or new.creator_id is distinct from old.creator_id
+       or new.campaign_id is distinct from old.campaign_id then
        raise exception 'Conversation participants cannot change';
-   end if;
-   if tg_table_name = 'applications' and
-      (new.creator_id is distinct from old.creator_id or
-       new.campaign_id is distinct from old.campaign_id) then
+     end if;
+   elsif tg_table_name = 'applications' then
+     if new.creator_id is distinct from old.creator_id
+       or new.campaign_id is distinct from old.campaign_id then
        raise exception 'Application participants cannot change';
+     end if;
    end if;
  end if;
  return new;
