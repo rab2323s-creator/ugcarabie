@@ -16,26 +16,33 @@ A responsive, right-to-left React platform for Arab UGC creators and businesses.
 
 **Scope:** Functional first release / MVP. This is not a production-certified or feature-identical clone of another service. Payment processing, video delivery, dispute handling, legal documents, abuse tooling, 2FA, monitoring, automated tests, and detailed business verification are not yet implemented.
 
-## Setup entirely from a web browser
+## Current deployment and maintenance (November 2026)
 
-1. Create a **private** GitHub repository named `ugcarabie` and make it accessible to the GitHub connection.
-2. Create a free project in [Supabase](https://supabase.com/dashboard). No local installation required.
-3. In **SQL Editor**, run `supabase/schema.sql` (a single time on a fresh project).
-4. In Supabase **Authentication > Providers**, enable email; in **URL Configuration**, set your deployed domain and allowed redirect URLs. Email confirmation should stay enabled for public launch.
-5. Copy **Project URL** and **publishable/anon key** from Supabase API settings. **Never share the service_role key or database password.**
-6. Create project environment variables (via the host control panel or `.env` locally):
-   - `VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co`
-   - `VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY`
-7. Deploy on [Cloudflare Pages](https://dash.cloudflare.com/) by connecting GitHub; set:
-   - Build command: `npm run build`
-   - Build output: `dist`
-   - Production branch: `main`
-   - Add both `VITE_*` environment variables in Cloudflare Pages settings.
-8. Add the custom domain `ugcarabie.com` from the Cloudflare Pages dashboard after obtaining the domain and DNS access.
-9. Create a separate staff account and promote it to `admin` using Supabase SQL Editor with its exact `auth.users.id`, e.g. `update public.profiles set role='admin' where id='UUID';` (do not paste any private API keys in chat).
-10. Before inviting the public, finish legal documents, privacy/deletion flow, moderation tools, transactional email branding and real-device testing.
+- Repository: `rab2323s-creator/ugcarabie` (public), production branch: `main`.
+- Production site: https://ugcarabie.com/ (HTTPS, hosted on **GitHub Pages**, not Cloudflare Pages).
+- Deployment: `.github/workflows/deploy-pages.yml` builds Vite, deploys `dist`, and runs Playwright smoke checks.
+- Database: dedicated Supabase project `nnhcnkatljjpjnxupltq` (`ugcarabie`); **never modify the separate `viva-media` project**.
+- Frontend exposes only the Supabase **publishable** key, never service-role credentials.
+- Initial schema for a *new* database: `supabase/schema.sql`. **Do not rerun it against the existing production database**.
+- Production security hardening was applied as Supabase migrations on November 22, 2026: creator approval-gated profile reads, internal `app_private` role helpers, restricted avatar object listing, and corrected application-update trigger.
+- The `avatars` bucket allows JPG, PNG and WebP at a maximum size of 102400 bytes; the client compresses before upload.
+- Creator profiles require staff approval. The platform does not host creator videos, only external portfolio URLs.
+- The site remains an MVP: real browser signups, email confirmation, real avatar uploads, and full browser-based account-to-account collaboration have **not** been independently validated.
+- Payment processing, business verification, dispute handling, finalized policies, and operational abuse-reporting tools are not launched.
 
-**Production domain:** GitHub Pages builds at `https://ugcarabie.com/` using Vite `base: '/'`, with the public Supabase URL and publishable key. With no approved creators or published campaigns, directories display clearly marked, non-clickable demo cards. Login and signup use the real Supabase project. For email verification, configure the Site URL and allowed redirect URL in Supabase Auth to include https://ugcarabie.com/ (and optionally https://www.ugcarabie.com/). The public URL and publishable key are not secret credentials; never put a secret/service_role key in client code.
+### Next acceptance checks
+
+1. Register a creator from https://ugcarabie.com/register?role=creator with an accessible test email; confirm the email and verify profile access.
+2. Complete the creator profile, add portfolio links, and upload a JPG/PNG/WebP avatar to verify compression to 100 KiB or below.
+3. Register a separate company from https://ugcarabie.com/register?role=company, confirm the email, and complete its profile.
+4. Create a separate admin account and promote only that account in Supabase SQL Editor; review and approve the creator.
+5. Publish a test campaign from the company account; have the approved creator apply; accept, start a chat and exchange messages.
+6. Check unauthorized access for a third unrelated signed-in user, and review the Supabase Security Advisor again.
+7. Complete legal policies, staff procedures, company moderation, sender email and additional protection before public launch.
+
+### Authentication settings
+
+Supabase Auth Site URL and allowed redirect must include `https://ugcarabie.com/`. Keep confirmation enabled and configure production mail settings before inviting real users.
 
 ### Commands (optional if using a browser-based dev environment)
 
