@@ -29,6 +29,12 @@ export default function Home(){
  <section className="section process-section"><div className="container"><SectionHeading eyebrow="بسيطة من البداية" title={<>كيف تشتغل <span className="accent">UGC Arabie؟</span></>} description="ثلاث خطوات بتختصر المسافة بين الموهبة والفرصة."/><div className="steps-grid">{[
  [<Camera/>, '01','جهّز بروفايلك','ارفع صورتك وأضف تخصصك وروابط أفضل أعمالك.'],[<MousePointer2/>,'02','اكتشف الفرص','تصفّح الحملات أو ابحث عن مبدع يناسب احتياجاتك.'],[<Send/>,'03','ابدأ التعاون','تواصلوا داخل المنصة، واتفقوا على التفاصيل والتسليم.']
  ].map(([icon,num,title,desc])=><div className="step" key={num}><span className="step-num">{num}</span><div className="step-icon">{icon}</div><h3>{title}</h3><p>{desc}</p></div>)}</div></div></section>
+ <section className="section"><div className="container"><SectionHeading eyebrow="أدلة UGC بالعربي" title={<>اعثر على <span className="accent">صانع محتوى UGC</span> أو فرصة عمل تناسبك</>} description="اختر ما تبحث عنه مباشرة: خدمات صناع محتوى للعلامات التجارية، فرص للمبدعين، أو شرح عملي لـUGC."/>
+ <div className="seo-home-cards">
+  <Link to="/for-brands" className="seo-home-card"><BriefcaseBusiness size={25}/><h3>تبحث عن صانع محتوى UGC لعلامتك التجارية؟</h3><p>دليل اختيار المبدع المناسب وكتابة حملة واضحة للشركات.</p><span>توظيف صانع محتوى UGC <ArrowLeft size={16}/></span></Link>
+  <Link to="/for-creators" className="seo-home-card"><Camera size={25}/><h3>تبحث عن فرص عمل UGC؟</h3><p>كيف تبني بورتفوليو وتتقدم لحملات العلامات التجارية.</p><span>فرص عمل UGC للمبدعين <ArrowLeft size={16}/></span></Link>
+  <Link to="/what-is-ugc" className="seo-home-card"><Video size={25}/><h3>ما هو UGC وما الفرق عن المؤثرين؟</h3><p>شرح المعنى والأمثلة وحقوق استخدام الفيديو في الإعلانات.</p><span>اقرأ دليل محتوى UGC <ArrowLeft size={16}/></span></Link>
+ </div></div></section>
  <section className="cta-section"><div className="container"><div className="cta-box"><span className="cta-decoration deco1">✳</span><span className="cta-decoration deco2">✦</span><div className="eyebrow">جاهز للخطوة الجاية؟</div><h2>خلّي المحتوى يفتحلك <span>أبواب جديدة.</span></h2><p>سواء كنت صانع محتوى أو علامة تجارية، مكانك معنا.</p><div className="cta-actions"><Link to="/register?role=creator" className="btn btn-white btn-large">سجّل كمبدع <ArrowLeft size={18}/></Link><Link to="/register?role=company" className="btn btn-outline-white btn-large">سجّل كشركة</Link></div></div></div></section>
  </>
 }
