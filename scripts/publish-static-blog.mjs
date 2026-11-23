@@ -14,6 +14,26 @@ const SITE='https://ugcarabie.com'
 await fs.cp(source,destination,{recursive:true,force:true})
 await fs.copyFile(path.join(root,'src','styles.css'),path.join(destination,'site.css'))
 
+// Images uploaded to /images/blog at the repository root are not copied by Vite.
+// Support that location as well as Vite's /public/images/blog, without overwriting
+// an image supplied in /public/images/blog when both paths exist.
+for(const article of articles){
+ const filename=path.basename(article.image)
+ if(!/^[-a-z0-9]+\.webp$/.test(filename) || article.image!=='/images/blog/'+filename) {
+  throw new Error('Invalid blog image path: '+article.image)
+ }
+ const target=path.join(root,'dist','images','blog',filename)
+ const uploaded=path.join(root,'images','blog',filename)
+ const published=await fs.access(target).then(()=>true,()=>false)
+ if(published)continue
+ const exists=await fs.access(uploaded).then(()=>true,()=>false)
+ if(exists){
+  await fs.mkdir(path.dirname(target),{recursive:true})
+  await fs.copyFile(uploaded,target)
+  console.log('Copied repository blog image:',filename)
+ }
+}
+
 for(const article of articles){
  const file=path.join(destination,article.slug,'index.html')
  let html=await fs.readFile(file,'utf8')
