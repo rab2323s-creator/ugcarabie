@@ -10,6 +10,7 @@ import { seoPages } from '../src/lib/seoContent.js'
 import { homepageSeo } from '../src/lib/homeSeo.js'
 import { legalDocs, legalInfo } from '../src/lib/legalContent.js'
 import { managedCampaigns, campaignInquiryLink } from '../src/lib/managedCampaigns.js'
+import { blogArticles, blogCategories, blogInfo, blogPath, blogCategory, blogListingSchema, articleSchema } from '../src/lib/blogContent.js'
 
 const SITE = 'https://ugcarabie.com'
 const OUT = path.resolve('dist')
@@ -74,7 +75,7 @@ function page(pathname, options={}){
   '<meta property="og:url" content="'+esc(canonical)+'" />',
   '<meta name="twitter:card" content="summary" />',
   ...(image&&/^https:\/\//.test(image)?['<meta property="og:image" content="'+esc(image)+'" />']:[]),
-  ...(structured?['<script id="seo-structured-data" type="application/ld+json">'+json({'@context':'https://schema.org','@graph':[org,structured]})+'</script>']:[]),
+  ...(structured?['<script id="seo-structured-data" type="application/ld+json">'+json({'@context':'https://schema.org','@graph':[org,...(Array.isArray(structured)?structured:[structured])]})+'</script>']:[]),
   '<style>.seo-prerender{padding:48px 24px;min-height:200px;direction:rtl}.seo-prerender-inner{max-width:960px;margin:auto}.seo-prerender h1{font-size:clamp(24px,3vw,38px)}.seo-prerender p{line-height:1.9}.seo-prerender a{color:inherit}</style>'
  ].join('\n')
  html=html.replace('</head>',extra+'\n</head>')
@@ -90,7 +91,7 @@ await page('/',{
  title:homepageSeo.title,
  description:homepageSeo.description,
  heading:homepageSeo.heading,
- body:'<h2>ابحث عن مبدعين وفرص UGC</h2>'+list([{href:'/creators/',title:'اكتشف صناع محتوى UGC عرب'},{href:'/campaigns/',title:'تصفح حملات وفرص UGC'},{href:'/how-it-works/',title:'كيف تعمل المنصة؟'}]),
+ body:'<h2>ابحث عن مبدعين وفرص UGC</h2>'+list([{href:'/creators/',title:'اكتشف صناع محتوى UGC عرب'},{href:'/campaigns/',title:'تصفح حملات وفرص UGC'},{href:'/how-it-works/',title:'كيف تعمل المنصة؟'},{href:'/blog/',title:'مدونة UGC Arabie — أدلة المبدعين والشركات'}]),
  structured:{'@type':'WebPage','@id':SITE+'/#home',name:'UGC Arabie — منصة صناع محتوى UGC العرب',url:SITE+'/',inLanguage:'ar',isPartOf:{'@id':website['@id']},about:org}
 })
 indexable.push({loc:SITE+'/'})
@@ -134,6 +135,42 @@ for(const [pathname,content] of Object.entries(seoPages)){
   body:'<p>'+esc(content.lead)+'</p>'+links+sections+questions,
   structured:{'@type':'WebPage',url:url(pathname),name:content.title,description:content.description,inLanguage:'ar',
     isPartOf:{'@id':website['@id']},about:org}
+ })
+}
+
+// Crawlable editorial blog pages: complete original HTML and search metadata.
+// Only advertise an image in schema/meta after it has actually been uploaded.
+const blogImageExists=async imagePath=>{
+ try{await fs.access(path.join(OUT,imagePath.replace(/^\//,'')));return true}catch{return false}
+}
+const blogListBody='<p>'+esc(blogInfo.lead)+'</p>'+
+ blogCategories.map(category=>'<section><h2>'+esc(category.title)+'</h2><p>'+esc(category.description)+'</p><ul>'+
+ blogArticles.filter(a=>a.category===category.id).map(a=>'<li><a href="'+esc(blogPath(a))+'/">'+esc(a.title)+'</a><p>'+esc(a.excerpt)+'</p></li>').join('')+'</ul></section>').join('')+
+ '<p><a href="/creators/">دليل المبدعين</a> · <a href="/campaigns/">فرص UGC</a></p>'
+await page('/blog',{
+ title:blogInfo.title,description:blogInfo.metaDescription,heading:blogInfo.heading,
+ body:blogListBody,structured:blogListingSchema(),updatedAt:blogInfo.updated
+})
+for(const article of blogArticles){
+ const pathname=blogPath(article)
+ const imageReady=await blogImageExists(article.image)
+ const body='<p>'+esc(article.lead)+'</p>'+
+ (imageReady?'<figure><img src="'+esc(article.image)+'" alt="'+esc(article.imageAlt)+'" width="1200" height="675" loading="eager" /></figure>':'')+
+ '<section><h2>ملخص سريع</h2><ul>'+article.takeaways.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>'+
+ article.sections.map(section=>'<section id="'+esc(section.id)+'"><h2>'+esc(section.heading)+'</h2>'+
+ '<p><strong>'+esc(section.answer)+'</strong></p>'+
+ (section.paragraphs||[]).map(p=>'<p>'+esc(p)+'</p>').join('')+
+ (section.bullets?.length?'<ul>'+section.bullets.map(b=>'<li>'+esc(b)+'</li>').join('')+'</ul>':'')+
+ (section.example?'<aside><strong>مثال تطبيقي</strong><p>'+esc(section.example)+'</p></aside>':'')+
+ '</section>').join('')+
+ '<section><h2>أسئلة شائعة</h2>'+article.faqs.map(f=>'<div><h3>'+esc(f.question)+'</h3><p>'+esc(f.answer)+'</p></div>').join('')+'</section>'+
+ '<section><h2>الخطوة التالية</h2><p>'+esc(article.cta.text)+'</p>'+list([{href:article.cta.href,title:article.cta.label}])+'</section>'+
+ '<section><h2>مقالات ذات صلة</h2>'+list(article.relatedSlugs.map(slug=>blogArticles.find(a=>a.slug===slug)).filter(Boolean).map(a=>({href:blogPath(a)+'/',title:a.title})))+'</section>'
+ await page(pathname,{
+  title:article.seoTitle+' | UGC Arabie',description:article.metaDescription,
+  heading:article.title,body,updatedAt:article.updated,
+  structured:articleSchema(article,{imageAvailable:imageReady}),
+  ...(imageReady?{image:SITE+article.image}:{})
  })
 }
 
