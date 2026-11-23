@@ -75,7 +75,7 @@ function page(pathname, options={}){
   '<meta property="og:url" content="'+esc(canonical)+'" />',
   '<meta name="twitter:card" content="summary" />',
   ...(image&&/^https:\/\//.test(image)?['<meta property="og:image" content="'+esc(image)+'" />']:[]),
-  ...(structured?['<script id="seo-structured-data" type="application/ld+json">'+json({'@context':'https://schema.org','@graph':[org,...(Array.isArray(structured)?structured:[structured])]})+'</script>']:[]),
+  ...(structured?['<script id="seo-structured-data" type="application/ld+json">'+json({'@context':'https://schema.org','@graph':[org,website,...(Array.isArray(structured)?structured:[structured])]})+'</script>']:[]),
   '<style>.seo-prerender{padding:48px 24px;min-height:200px;direction:rtl}.seo-prerender-inner{max-width:960px;margin:auto}.seo-prerender h1{font-size:clamp(24px,3vw,38px)}.seo-prerender p{line-height:1.9}.seo-prerender a{color:inherit}</style>'
  ].join('\n')
  html=html.replace('</head>',extra+'\n</head>')
