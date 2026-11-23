@@ -24,10 +24,9 @@ export function Legal({type}){
     <section className="legal-developer" aria-label="جهة تطوير UGC Arabie">
      <div className="legal-developer-label">جهة تطوير المنصة</div>
      <h2>Viva Media Creative <span>— VMC Labs</span></h2>
-     <p>منصة UGC Arabie مشروع مستقل من تطوير <a href={legalInfo.developerUrl} target="_blank" rel="noopener noreferrer">Viva Media Creative</a> ضمن مشاريع VMC Labs. هذا توثيق لجهة التطوير، وليس إقراراً بصفة المشغّل القانوني أو المسؤول عن البيانات.</p>
+     <p>تم تطوير منصة UGC Arabie بواسطة <a href={legalInfo.developerUrl} target="_blank" rel="noopener noreferrer">Viva Media Creative</a>.</p>
      <a className="legal-dev-link" href={legalInfo.developerUrl} target="_blank" rel="noopener noreferrer">التعرّف على مشاريع VMC Labs <ArrowLeft size={16}/></a>
     </section>
-    <div className="legal-notice" role="note"><strong>معلومات قانونية تحتاج استكمالاً</strong><p>{doc.alert}</p></div>
     {doc.sections.map(item=><section className="legal-section" key={item.id} id={item.id}>
      <h2>{item.heading}</h2>
      {item.paragraphs.map((text,i)=><p key={i}>{text}</p>)}
