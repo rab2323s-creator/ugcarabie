@@ -46,6 +46,13 @@ jobs:
           test -f dist/for-brands/index.html
           test -f dist/for-creators/index.html
           test -f dist/what-is-ugc/index.html
+          test -f dist/campaigns/ugc-beauty-sa/index.html
+          test -f dist/campaigns/ugc-tech-ae/index.html
+          test -f dist/campaigns/ugc-cafe-eg/index.html
+          grep -q 'info@ugcarabie.com' dist/campaigns/ugc-beauty-sa/index.html
+          grep -q 'https://ugcarabie.com/campaigns/ugc-beauty-sa/' dist/sitemap.xml
+          grep -q 'https://ugcarabie.com/campaigns/ugc-tech-ae/' dist/sitemap.xml
+          grep -q 'https://ugcarabie.com/campaigns/ugc-cafe-eg/' dist/sitemap.xml
           grep -q 'توظيف صانع محتوى UGC عربي' dist/for-brands/index.html
           grep -q 'فرص عمل UGC للمبدعين العرب' dist/for-creators/index.html
           grep -q 'ما هو UGC' dist/what-is-ugc/index.html
