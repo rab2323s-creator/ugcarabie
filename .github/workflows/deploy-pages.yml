@@ -55,6 +55,14 @@ jobs:
           grep -q 'https://ugcarabie.com/what-is-ugc/' dist/sitemap.xml
           grep -q 'rel="canonical"' dist/creators/index.html
           grep -q 'name="robots" content="noindex' dist/login/index.html
+          test -f dist/terms/index.html
+          test -f dist/privacy/index.html
+          grep -q 'Viva Media Creative' dist/terms/index.html
+          grep -q 'Viva Media Creative' dist/privacy/index.html
+          grep -q 'الملكية الفكرية' dist/terms/index.html
+          grep -q 'Supabase' dist/privacy/index.html
+          grep -q 'name="robots" content="noindex' dist/terms/index.html
+          grep -q 'name="robots" content="noindex' dist/privacy/index.html
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
