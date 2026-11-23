@@ -59,7 +59,9 @@ jobs:
           grep -q 'Viva Media Creative' dist/terms/index.html
           grep -q 'Viva Media Creative' dist/privacy/index.html
           grep -q 'الملكية الفكرية' dist/terms/index.html
-          grep -q 'Supabase' dist/privacy/index.html
+          grep -q 'info@ugcarabie.com' dist/privacy/index.html
+          grep -q 'ستة أشهر وسنة' dist/privacy/index.html
+          ! grep -q 'معلومات قانونية تحتاج استكمالاً' dist/privacy/index.html
           grep -q 'name="robots" content="noindex' dist/terms/index.html
           grep -q 'name="robots" content="noindex' dist/privacy/index.html
       - name: Configure GitHub Pages
