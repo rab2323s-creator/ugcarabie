@@ -1,6 +1,41 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
 import {ArrowLeft,UserRound,Building2,CheckCircle2,Sparkles} from 'lucide-react'
+import {legalInfo,legalDocs} from '../lib/legalContent'
 export function HowItWorks(){return <div className="container static-page"><div className="page-heading centered"><div className="eyebrow">✦ كيف نشتغل؟</div><h1>طريقك للتعاون <span className="accent">أسهل</span></h1><p>إلك مسار واضح، سواء بدك تنتج محتوى أو تدور على صانع محتوى.</p></div><div className="two-journeys"><div className="journey"><div className="journey-icon"><UserRound/></div><h2>أنا صانع محتوى</h2><ol><li>أنشئ حسابك وأضف صورة ونبذة وتعريفاً بأعمالك.</li><li>ارفع روابط أفضل فيديوهاتك وانتظر مراجعة البروفايل.</li><li>تصفح الحملات وتقدم للفرص المناسبة.</li><li>بعد قبولك، تواصل مع الشركة واتفقوا على التفاصيل.</li></ol><Link className="btn btn-primary" to="/register?role=creator">سجّل كمبدع <ArrowLeft size={17}/></Link></div><div className="journey"><div className="journey-icon lavender"><Building2/></div><h2>أنا شركة</h2><ol><li>افتح حساب لشركتك وأكمل بياناتها.</li><li>تصفح المبدعين حسب البلد والتخصص والميزانية.</li><li>انشر حملة مع وصف واضح ومتطلبات وميزانية.</li><li>راجع الطلبات، اختر المبدع، وتواصلوا داخل المنصة.</li></ol><Link className="btn btn-dark" to="/register?role=company">سجّل كشركة <ArrowLeft size={17}/></Link></div></div></div>}
-export function Legal({type}){const privacy=type==='privacy';return <div className="container static-page legal"><div className="page-heading"><div className="eyebrow">معلومات قانونية</div><h1>{privacy?'سياسة الخصوصية':'شروط الاستخدام'}</h1><p>مسودة أولية تحتاج مراجعة قانونية وتحديد بيانات المشغّل قبل النشر الرسمي.</p></div><div className="white-panel"><h2>{privacy?'كيف نتعامل مع البيانات':'استخدام المنصة'}</h2>{privacy?<><p>قد تجمع المنصة الاسم والبريد الإلكتروني والصورة الشخصية وبيانات الملف المهني وروابط الأعمال والمراسلات اللازمة للتعاون. تستخدم البيانات لتقديم الحسابات والتواصل وعرض البروفايلات العامة.</p><p>يظهر الاسم والصورة والبلد وروابط الأعمال للجمهور بعد اعتماد بروفايل المبدع؛ وتبقى الرسائل بين أطراف المحادثة المخوّلين. تُستخدم خدمات الاستضافة وقاعدة البيانات لمعالجة هذه المعلومات.</p><p>يجب إضافة بيانات المسؤول عن معالجة البيانات، الأساس القانوني، مدة الاحتفاظ، آلية طلب الحذف وحقوق المستخدمين، ومزودي الخدمة قبل الإطلاق.</p></>:<><p>المنصة وسيلة للتواصل بين الشركات وصناع المحتوى. كل طرف مسؤول عن دقة المعلومات التي ينشرها وعن حقوق الاستخدام والالتزام بالتعاقدات والقوانين ذات الصلة.</p><p>يمنع نشر محتوى منتهك للحقوق أو روابط ضارة أو عروض مضللة أو محاولات الاحتيال. يحتفظ مشغّل المنصة بحق مراجعة الحسابات والحملات وإيقاف الاستخدام المخالف بعد وضع سياسة إشراف واضحة.</p><p>المدفوعات وحقوق استخدام محتوى UGC والتعديلات والمواعيد تحتاج اتفاقاً صريحاً بين الأطراف. هذه المسودة ليست بديلاً عن شروط نهائية يراجعها مختص.</p></>}<p className="legal-warning">هذه صفحة تطويرية فقط، وليست سياسة قانونية مكتملة. لا تطلق المنصة للمستخدمين قبل إكمالها.</p></div></div>}
+export function Legal({type}){
+ const privacy=type==='privacy'
+ const doc=legalDocs[privacy?'privacy':'terms']
+ return <article className="container static-page legal legal-document" lang="ar" dir="rtl">
+  <nav className="legal-breadcrumb" aria-label="مسار التصفح"><Link to="/">الرئيسية</Link><span>/</span><span aria-current="page">{doc.title}</span></nav>
+  <header className="page-heading legal-heading">
+   <div className="eyebrow">{privacy?'حماية البيانات والخصوصية':'حقوق ومسؤوليات المستخدمين'}</div>
+   <h1>{doc.title}</h1>
+   <p>{doc.subtitle}</p>
+   <div className="legal-meta"><span>UGC Arabie</span><span>آخر مراجعة: {legalInfo.updated}</span></div>
+  </header>
+  <p className="legal-intro">{doc.summary}</p>
+  <div className="legal-content-grid">
+   <nav className="legal-toc" aria-label="محتويات الوثيقة">
+    <strong>في هذه الصفحة</strong>
+    {doc.sections.map(item=><a key={item.id} href={'#'+item.id}>{item.heading}</a>)}
+   </nav>
+   <div className="legal-article">
+    <section className="legal-developer" aria-label="جهة تطوير UGC Arabie">
+     <div className="legal-developer-label">جهة تطوير المنصة</div>
+     <h2>Viva Media Creative <span>— VMC Labs</span></h2>
+     <p>منصة UGC Arabie مشروع مستقل من تطوير <a href={legalInfo.developerUrl} target="_blank" rel="noopener noreferrer">Viva Media Creative</a> ضمن مشاريع VMC Labs. هذا توثيق لجهة التطوير، وليس إقراراً بصفة المشغّل القانوني أو المسؤول عن البيانات.</p>
+     <a className="legal-dev-link" href={legalInfo.developerUrl} target="_blank" rel="noopener noreferrer">التعرّف على مشاريع VMC Labs <ArrowLeft size={16}/></a>
+    </section>
+    <div className="legal-notice" role="note"><strong>معلومات قانونية تحتاج استكمالاً</strong><p>{doc.alert}</p></div>
+    {doc.sections.map(item=><section className="legal-section" key={item.id} id={item.id}>
+     <h2>{item.heading}</h2>
+     {item.paragraphs.map((text,i)=><p key={i}>{text}</p>)}
+     {item.links?.length>0&&<div className="legal-reference-links">{item.links.map(link=>link.href.startsWith('/')?<Link to={link.href} key={link.href}>{link.label}<ArrowLeft size={15}/></Link>:<a key={link.href} href={link.href} target={link.href.startsWith('http')?'_blank':undefined} rel={link.href.startsWith('http')?'noopener noreferrer':undefined}>{link.label}<ArrowLeft size={15}/></a>)}</div>}
+    </section>)}
+    <div className="legal-end-links"><Link to={privacy?'/terms':'/privacy'}>{privacy?'اقرأ شروط الاستخدام':'اقرأ سياسة الخصوصية'}<ArrowLeft size={16}/></Link><Link to="/">العودة للرئيسية<ArrowLeft size={16}/></Link></div>
+   </div>
+  </div>
+ </article>
+}
 export function NotFound(){return <div className="container page-padded"><div className="empty-state"><h1>404</h1><h2>الصفحة مش موجودة</h2><p>يمكن تغيّر الرابط أو تم حذف الصفحة.</p><Link to="/" className="btn btn-primary">العودة للرئيسية <ArrowLeft size={17}/></Link></div></div>}
