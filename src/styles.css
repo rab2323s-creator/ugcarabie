@@ -47,3 +47,11 @@
 .campaign-apply-link:hover{filter:brightness(.96)}
 .campaign-contact-box{margin-top:28px;background:#fff;border:1px solid #f2e3eb;border-radius:18px;padding:25px;display:flex;flex-wrap:wrap;gap:15px 24px;align-items:center;justify-content:space-between}
 .campaign-contact-box strong{font-size:18px}.campaign-contact-box p{font-size:14px;color:var(--muted);margin:0}.campaign-contact-box .btn{white-space:normal}
+
+
+/* Full managed UGC campaign briefs and deliverables. */
+.requirements>div{align-items:flex-start;line-height:1.9}
+.requirements>div svg{flex:0 0 18px;margin-top:4px}
+.campaign-budget-panel p{line-height:2;color:#5b5461}
+.campaign-budget-panel p+p{margin-top:12px}
+.campaign-specific-note{background:#fff8ec;border:1px solid #f6e3c7;border-radius:11px;padding:13px 15px}
