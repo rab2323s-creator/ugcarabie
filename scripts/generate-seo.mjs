@@ -10,7 +10,7 @@ import { seoPages } from '../src/lib/seoContent.js'
 import { homepageSeo } from '../src/lib/homeSeo.js'
 import { legalDocs, legalInfo } from '../src/lib/legalContent.js'
 import { managedCampaigns, campaignInquiryLink } from '../src/lib/managedCampaigns.js'
-import { blogArticles, blogCategories, blogInfo, blogPath, blogCategory, blogListingSchema, articleSchema } from '../src/lib/blogContent.js'
+import { blogArticles, blogInfo, blogPath } from '../src/lib/blogContent.js'
 
 const SITE = 'https://ugcarabie.com'
 const OUT = path.resolve('dist')
@@ -138,40 +138,11 @@ for(const [pathname,content] of Object.entries(seoPages)){
  })
 }
 
-// Crawlable editorial blog pages: complete original HTML and search metadata.
-// Only advertise an image in schema/meta after it has actually been uploaded.
-const blogImageExists=async imagePath=>{
- try{await fs.access(path.join(OUT,imagePath.replace(/^\//,'')));return true}catch{return false}
-}
-const blogListBody='<p>'+esc(blogInfo.lead)+'</p>'+
- blogCategories.map(category=>'<section><h2>'+esc(category.title)+'</h2><p>'+esc(category.description)+'</p><ul>'+
- blogArticles.filter(a=>a.category===category.id).map(a=>'<li><a href="'+esc(blogPath(a))+'/">'+esc(a.title)+'</a><p>'+esc(a.excerpt)+'</p></li>').join('')+'</ul></section>').join('')+
- '<p><a href="/creators/">دليل المبدعين</a> · <a href="/campaigns/">فرص UGC</a></p>'
-await page('/blog',{
- title:blogInfo.title,description:blogInfo.metaDescription,heading:blogInfo.heading,
- body:blogListBody,structured:blogListingSchema(),updatedAt:blogInfo.updated
-})
+// Standalone source HTML is stored under blog/, not generated from React.
+// The publish-static-blog step copies those exact files to dist/ after this sitemap is written.
+indexable.push({loc:url('/blog'),lastmod:blogInfo.updated})
 for(const article of blogArticles){
- const pathname=blogPath(article)
- const imageReady=await blogImageExists(article.image)
- const body='<p>'+esc(article.lead)+'</p>'+
- (imageReady?'<figure><img src="'+esc(article.image)+'" alt="'+esc(article.imageAlt)+'" width="1200" height="675" loading="eager" /></figure>':'')+
- '<section><h2>ملخص سريع</h2><ul>'+article.takeaways.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>'+
- article.sections.map(section=>'<section id="'+esc(section.id)+'"><h2>'+esc(section.heading)+'</h2>'+
- '<p><strong>'+esc(section.answer)+'</strong></p>'+
- (section.paragraphs||[]).map(p=>'<p>'+esc(p)+'</p>').join('')+
- (section.bullets?.length?'<ul>'+section.bullets.map(b=>'<li>'+esc(b)+'</li>').join('')+'</ul>':'')+
- (section.example?'<aside><strong>مثال تطبيقي</strong><p>'+esc(section.example)+'</p></aside>':'')+
- '</section>').join('')+
- '<section><h2>أسئلة شائعة</h2>'+article.faqs.map(f=>'<div><h3>'+esc(f.question)+'</h3><p>'+esc(f.answer)+'</p></div>').join('')+'</section>'+
- '<section><h2>الخطوة التالية</h2><p>'+esc(article.cta.text)+'</p>'+list([{href:article.cta.href,title:article.cta.label}])+'</section>'+
- '<section><h2>مقالات ذات صلة</h2>'+list(article.relatedSlugs.map(slug=>blogArticles.find(a=>a.slug===slug)).filter(Boolean).map(a=>({href:blogPath(a)+'/',title:a.title})))+'</section>'
- await page(pathname,{
-  title:article.seoTitle+' | UGC Arabie',description:article.metaDescription,
-  heading:article.title,body,updatedAt:article.updated,
-  structured:articleSchema(article,{imageAvailable:imageReady}),
-  ...(imageReady?{image:SITE+article.image}:{})
- })
+ indexable.push({loc:url(blogPath(article)),lastmod:article.updated})
 }
 
 for(const c of creators){
