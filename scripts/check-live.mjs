@@ -26,7 +26,7 @@ try {
         if (exceptions.length) throw new Error('JavaScript error: ' + exceptions.join('; '));
         const app = await page.locator('#root').innerText();
         if (app.length < 300) throw new Error('React app rendered too little content: ' + app.length);
-        for (const route of ['register?role=creator', 'register?role=company', 'login', 'creators', 'campaigns', 'for-brands', 'for-creators', 'what-is-ugc']) {
+        for (const route of ['register?role=creator', 'register?role=company', 'login', 'creators', 'campaigns', 'for-brands', 'for-creators', 'what-is-ugc', 'terms', 'privacy']) {
           const target = new URL(route, siteUrl).toString();
           const routeResponse = await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (routeResponse?.status() !== 200) throw new Error('SEO route ' + route + ' must return HTTP 200, got ' + routeResponse?.status());
@@ -46,7 +46,14 @@ try {
         if (sitemap.status() !== 200 || !(await sitemap.text()).includes('<urlset')) throw new Error('SEO sitemap unavailable');
         const robots = await page.request.get(new URL('/robots.txt',siteUrl).toString());
         if (robots.status() !== 200 || !(await robots.text()).includes('Sitemap:')) throw new Error('SEO robots unavailable');
-        const privateSeo = await page.request.get(new URL('/login/',siteUrl).toString());
+        for (const slug of ['terms','privacy']) {
+          const response = await page.request.get(new URL('/'+slug+'/',siteUrl).toString());
+          const body = await response.text();
+          if (response.status() !== 200) throw new Error('Legal page /'+slug+'/ HTTP '+response.status());
+          if (!body.includes('Viva Media Creative') || !body.includes('name="robots" content="noindex')) throw new Error('Legal attribution or noindex missing on '+slug);
+          if (!body.includes('<h2>') || !body.includes('معلومات قانونية تحتاج استكمالاً')) throw new Error('Legal content not pre-rendered on '+slug);
+        }
+                const privateSeo = await page.request.get(new URL('/login/',siteUrl).toString());
         if (privateSeo.status() !== 200 || !(await privateSeo.text()).includes('content="noindex,follow"')) throw new Error('Private route noindex missing');
         await page.goto(siteUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
         await page.locator('h1').first().waitFor({ state: 'visible', timeout: 12000 });
