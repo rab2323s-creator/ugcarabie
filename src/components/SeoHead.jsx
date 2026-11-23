@@ -16,7 +16,7 @@ const privateTitles={
  '/register':'إنشاء حساب', '/login':'تسجيل الدخول', '/dashboard':'لوحة التحكم',
  '/dashboard/profile':'الملف الشخصي', '/dashboard/campaigns/new':'حملة جديدة',
  '/messages':'الرسائل الخاصة','/support':'مراسلات الإدارة','/admin':'إدارة المنصة',
- '/terms':'شروط الاستخدام — مسودة','/privacy':'سياسة الخصوصية — مسودة'
+ '/terms':'شروط الاستخدام','/privacy':'سياسة الخصوصية'
 }
 const short=(text,n=160)=>{const s=String(text||'').replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n-1).trimEnd()+'…':s}
 const canonical=path=>SITE+(path==='/'?'/':path.replace(/\/$/,'')+'/')
