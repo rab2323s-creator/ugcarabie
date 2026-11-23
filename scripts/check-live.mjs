@@ -26,7 +26,7 @@ try {
         if (exceptions.length) throw new Error('JavaScript error: ' + exceptions.join('; '));
         const app = await page.locator('#root').innerText();
         if (app.length < 300) throw new Error('React app rendered too little content: ' + app.length);
-        for (const route of ['register?role=creator', 'register?role=company', 'login', 'creators', 'campaigns', 'for-brands', 'for-creators', 'what-is-ugc', 'terms', 'privacy']) {
+        for (const route of ['register?role=creator', 'register?role=company', 'login', 'creators', 'campaigns', 'for-brands', 'for-creators', 'what-is-ugc', 'terms', 'privacy', 'blog', 'blog/كيف-تصبح-صانع-محتوى-UGC-بدون-متابعين', 'blog/أسعار-فيديوهات-UGC-في-السعودية']) {
           const target = new URL(route, siteUrl).toString();
           const routeResponse = await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (routeResponse?.status() !== 200) throw new Error('SEO route ' + route + ' must return HTTP 200, got ' + routeResponse?.status());
@@ -41,6 +41,14 @@ try {
           const html = await res.text();
           if (res.status() !== 200 || !html.includes('rel="canonical"') || !html.includes('application/ld+json')) throw new Error('SEO '+slug+' metadata or HTTP 200 missing');
           if (!html.includes('<h2>') || !html.includes('أسئلة شائعة')) throw new Error('SEO '+slug+' body not prerendered');
+        }
+        for (const slug of ['كيف-تصبح-صانع-محتوى-UGC-بدون-متابعين','كيف-تختار-صانع-محتوى-UGC-لعلامتك','أسعار-فيديوهات-UGC-في-السعودية']) {
+          const endpoint = new URL('/blog/'+slug+'/',siteUrl).toString();
+          const result = await page.request.get(endpoint);
+          const html = await result.text();
+          if(result.status()!==200) throw new Error('Blog direct HTML must return 200 '+slug+': '+result.status());
+          if(!html.includes('BlogPosting') || !html.includes('BreadcrumbList') || !html.includes('rel="canonical"')) throw new Error('Blog HTML metadata missing: '+slug);
+          if(!html.includes('<h2>') || !html.includes('meta name="description"')) throw new Error('Blog content missing: '+slug);
         }
         const sitemap = await page.request.get(new URL('/sitemap.xml',siteUrl).toString());
         if (sitemap.status() !== 200 || !(await sitemap.text()).includes('<urlset')) throw new Error('SEO sitemap unavailable');
