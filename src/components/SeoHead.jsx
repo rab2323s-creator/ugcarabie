@@ -4,6 +4,7 @@ import {supabase} from '../lib/supabase'
 import {seoPages} from '../lib/seoContent'
 import {homepageSeo} from '../lib/homeSeo'
 import {managedCampaigns} from '../lib/managedCampaigns'
+import {blogArticles,blogInfo,findBlogArticle,articleSchema,blogListingSchema} from '../lib/blogContent'
 
 const SITE='https://ugcarabie.com'
 const org={'@type':'Organization',name:'UGC Arabie',url:SITE+'/'}
@@ -49,7 +50,7 @@ const apply=(pathname,options)=>{
  if(index&&structured){
   const script=document.createElement('script')
   script.id='seo-structured-data';script.type='application/ld+json'
-  script.textContent=JSON.stringify({'@context':'https://schema.org','@graph':[org,structured]}).replace(/</g,'\\u003c')
+  script.textContent=JSON.stringify({'@context':'https://schema.org','@graph':[org,...(Array.isArray(structured)?structured:[structured])]}).replace(/</g,'\\u003c')
   document.head.appendChild(script)
  }
 }
@@ -57,7 +58,20 @@ export default function SeoHead(){
  const {pathname}=useLocation()
  useEffect(()=>{
   let active=true
-  const path=pathname==='/'?'/':pathname.replace(/\/$/,'')
+  let decodedPath
+  try{decodedPath=decodeURI(pathname)}catch{decodedPath=pathname}
+  const path=decodedPath==='/'?'/':decodedPath.replace(/\/$/,'')
+  if(path==='/blog'){
+   apply(path,{title:blogInfo.title,description:blogInfo.metaDescription,structured:blogListingSchema()})
+   return()=>{active=false}
+  }
+  if(path.startsWith('/blog/')){
+   const article=findBlogArticle(path.slice('/blog/'.length))
+   if(article){
+    apply(path,{title:article.seoTitle+' | UGC Arabie',description:article.metaDescription,structured:articleSchema(article)})
+    return()=>{active=false}
+   }
+  }
   const common=defaults[path]
   if(common){
    apply(path,{title:common[0],description:common[1],structured:{'@type':common[2],name:common[0],url:canonical(path),inLanguage:'ar'}})
