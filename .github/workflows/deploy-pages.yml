@@ -38,6 +38,7 @@ jobs:
         run: npm run build
       - name: Verify generated SEO index and route pages
         run: |
+          node scripts/check-blog-content.mjs
           test -f dist/sitemap.xml
           test -f dist/robots.txt
           test -f dist/creators/index.html
