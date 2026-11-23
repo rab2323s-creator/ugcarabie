@@ -51,7 +51,7 @@ try {
           const body = await response.text();
           if (response.status() !== 200) throw new Error('Legal page /'+slug+'/ HTTP '+response.status());
           if (!body.includes('Viva Media Creative') || !body.includes('name="robots" content="noindex')) throw new Error('Legal attribution or noindex missing on '+slug);
-          if (!body.includes('<h2>') || !body.includes('معلومات قانونية تحتاج استكمالاً')) throw new Error('Legal content not pre-rendered on '+slug);
+          if (!body.includes('<h2>') || !body.includes('info@ugcarabie.com') || body.includes('معلومات قانونية تحتاج استكمالاً')) throw new Error('Legal content not pre-rendered on '+slug);
         }
                 const privateSeo = await page.request.get(new URL('/login/',siteUrl).toString());
         if (privateSeo.status() !== 200 || !(await privateSeo.text()).includes('content="noindex,follow"')) throw new Error('Private route noindex missing');
