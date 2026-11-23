@@ -7,7 +7,8 @@ import {managedCampaigns} from '../lib/managedCampaigns'
 import {blogArticles,blogInfo,findBlogArticle,articleSchema,blogListingSchema} from '../lib/blogContent'
 
 const SITE='https://ugcarabie.com'
-const org={'@type':'Organization',name:'UGC Arabie',url:SITE+'/'}
+const org={'@type':'Organization','@id':SITE+'/#organization',name:'UGC Arabie',url:SITE+'/'}
+const website={'@type':'WebSite','@id':SITE+'/#website',name:'UGC Arabie',url:SITE+'/',inLanguage:'ar'}
 const defaults={
  '/': [homepageSeo.title,homepageSeo.description,'WebPage'],
  '/creators': ['صناع محتوى UGC عرب | اكتشف مبدعين لعلامتك التجارية | UGC Arabie','ابحث عن صناع محتوى UGC عرب حسب البلد والتخصص، واستعرض ملفاتهم وروابط أعمالهم لاختيار المبدع المناسب لحملتك الإعلانية.','CollectionPage'],
@@ -50,7 +51,7 @@ const apply=(pathname,options)=>{
  if(index&&structured){
   const script=document.createElement('script')
   script.id='seo-structured-data';script.type='application/ld+json'
-  script.textContent=JSON.stringify({'@context':'https://schema.org','@graph':[org,...(Array.isArray(structured)?structured:[structured])]}).replace(/</g,'\\u003c')
+  script.textContent=JSON.stringify({'@context':'https://schema.org','@graph':[org,website,...(Array.isArray(structured)?structured:[structured])]}).replace(/</g,'\\u003c')
   document.head.appendChild(script)
  }
 }
