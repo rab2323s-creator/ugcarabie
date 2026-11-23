@@ -105,7 +105,7 @@ await page('/campaigns',{
  title:'فرص عمل وحملات UGC للمبدعين العرب | UGC Arabie',
  description:'تصفّح فرص وحملات إنشاء محتوى UGC للعلامات التجارية، واعرف التخصصات والميزانيات والمتطلبات، وقدّم على التعاون المناسب لك.',
  heading:'حملات UGC وفرص التعاون للمبدعين',
- body:'<h2>حملات منشورة</h2>'+(campaigns.length?list(campaigns.slice(0,100).map(c=>({href:'/campaigns/'+c.id+'/',title:c.title}))):'<p>ستظهر الحملات هنا عندما تنشر الشركات فرص التعاون.</p>'),
+ body:'<h2>فرص التعاون المتاحة</h2>'+list([...managedCampaigns.map(c=>({href:'/campaigns/'+c.id+'/',title:c.title})),...campaigns.slice(0,100).map(c=>({href:'/campaigns/'+c.id+'/',title:c.title}))]),
  structured:{'@type':'CollectionPage',name:'حملات وفرص UGC',url:url('/campaigns'),inLanguage:'ar'}
 })
 await page('/how-it-works',{
