@@ -30,7 +30,12 @@ try {
           const target = new URL(route, siteUrl).toString();
           const routeResponse = await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (routeResponse?.status() !== 200) throw new Error('SEO route ' + route + ' must return HTTP 200, got ' + routeResponse?.status());
-          await page.locator('#root').locator('h1').first().waitFor({ state: 'visible', timeout: 12000 });
+          if (route === 'blog' || route.startsWith('blog/')) {
+            await page.locator('main#main h1').first().waitFor({ state: 'visible', timeout: 12000 });
+            if (await page.locator('#root').count()) throw new Error('Blog page should be standalone HTML, not React: ' + route);
+          } else {
+            await page.locator('#root').locator('h1').first().waitFor({ state: 'visible', timeout: 12000 });
+          }
           if (exceptions.length) throw new Error('JS error on ' + route + ': ' + exceptions.join('; '));
         }
         const homepage = await page.request.get(siteUrl);
