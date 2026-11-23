@@ -1,19 +1,9 @@
-import {creatorAndBrandGuides} from './blogContentPart1.js'
-import {marketAndBrandGuides} from './blogContentPart2.js'
+import manifest from '../../blog/manifest.json' with {type:'json'}
 
-export const blogCategories = [
- {id:'creators',title:'لصنّاع المحتوى',description:'من أول فيديو UGC إلى بورتفوليو مرتب وفرصة تعاون مناسبة.',color:'peach'},
- {id:'brands',title:'للشركات',description:'اختيار المبدعين وصناعة حملات واضحة مع حقوق استخدام محددة.',color:'violet'},
- {id:'markets',title:'أدلة السوق العربي',description:'أمثلة عملية من فرص وأسواق السعودية والإمارات ومصر.',color:'blue'}
-]
-export const blogArticles=[...creatorAndBrandGuides,...marketAndBrandGuides]
-export const blogInfo={
- title:'مدونة UGC Arabie | أدلة UGC للمبدعين والشركات',
- metaDescription:'مقالات UGC عربية أصلية للمبدعين والشركات: صناعة المحتوى، البورتفوليو، اختيار صناع UGC، الأسعار وفرص التعاون في السعودية والإمارات ومصر.',
- heading:'دليل الإبداع في عالم UGC',
- lead:'أفكار قابلة للتطبيق، وأجوبة واضحة عن صناعة محتوى UGC والتعاون بين العلامات التجارية والمبدعين في العالم العربي.',
- updated:'2026-11-23'
-}
+// Navigation metadata only: full editorial text lives in blog/<slug>/index.html.
+export const blogCategories=manifest.categories
+export const blogArticles=manifest.articles
+export const blogInfo=manifest.info
 export const blogPath=article=>'/blog/'+article.slug
 export const findBlogArticle=slug=>blogArticles.find(article=>article.slug===slug)
 export const blogCategory=id=>blogCategories.find(category=>category.id===id)
