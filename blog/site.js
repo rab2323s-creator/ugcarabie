@@ -1,0 +1,12 @@
+/* Lightweight progressive enhancements. Articles themselves require no JavaScript. */
+(()=>{'use strict';
+const menu=document.getElementById('blog-menu-toggle'),nav=document.getElementById('blog-site-nav');
+if(menu&&nav){menu.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?'إغلاق القائمة':'فتح القائمة');menu.textContent=open?'✕':'☰'})}
+const filters=[...document.querySelectorAll('[data-blog-filter]')],search=document.querySelector('[data-blog-search]'),cards=[...document.querySelectorAll('[data-blog-card]')],count=document.getElementById('blog-results-count'),title=document.getElementById('blog-list-title'),overview=document.getElementById('blog-category-overview'),grid=document.getElementById('blog-post-grid'),empty=document.getElementById('blog-no-results');let filter='all';
+function render(){const q=(search?.value||'').trim().toLocaleLowerCase('ar');let visible=0;for(const el of cards){const show=(filter==='all'||el.dataset.category===filter)&&(!q||(el.dataset.search||'').toLocaleLowerCase('ar').includes(q));el.hidden=!show;if(show)visible++;el.classList.toggle('blog-post-featured',show&&filter==='all'&&!q&&visible===1)}for(const b of filters){const active=b.dataset.blogFilter===filter;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))}if(count)count.textContent=visible+' مقالات';if(title)title.textContent=filter==='all'?'أحدث الأدلة والمقالات':({creators:'لصنّاع المحتوى',brands:'للشركات',markets:'أدلة السوق العربي'}[filter]||'مقالات UGC');if(overview)overview.hidden=filter!=='all'||!!q;if(grid)grid.hidden=visible===0;if(empty)empty.hidden=visible!==0}
+filters.forEach(button=>button.addEventListener('click',()=>{filter=button.dataset.blogFilter;render()}));
+document.querySelectorAll('[data-category-jump]').forEach(button=>button.addEventListener('click',()=>{filter=button.dataset.categoryJump;render();document.querySelector('.blog-controls')?.scrollIntoView({behavior:'smooth'})}));
+search?.addEventListener('input',render);
+document.getElementById('blog-reset')?.addEventListener('click',()=>{filter='all';if(search)search.value='';render()});
+if(cards.length)render();
+})();
