@@ -11,6 +11,7 @@ import {Messages} from './pages/Messages'
 import SupportMessages from './pages/SupportMessages'
 import Admin from './pages/Admin'
 import {HowItWorks,Legal,NotFound} from './pages/Static'
+import {BlogIndex,BlogArticle} from './pages/Blog'
 
 function ScrollToTop(){const {pathname}=useLocation();useEffect(()=>{window.scrollTo({top:0,behavior:'instant'})},[pathname]);return null}
 export default function App(){return <PageLayout><ScrollToTop/><SeoHead/><Routes>
@@ -31,6 +32,8 @@ export default function App(){return <PageLayout><ScrollToTop/><SeoHead/><Routes
  <Route path="/for-brands" element={<SearchLanding/>}/>
  <Route path="/for-creators" element={<SearchLanding/>}/>
  <Route path="/what-is-ugc" element={<SearchLanding/>}/>
+ <Route path="/blog" element={<BlogIndex/>}/>
+ <Route path="/blog/:slug" element={<BlogArticle/>}/>
  <Route path="/terms" element={<Legal type="terms"/>}/>
  <Route path="/privacy" element={<Legal type="privacy"/>}/>
  <Route path="*" element={<NotFound/>}/>
