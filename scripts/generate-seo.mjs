@@ -8,6 +8,7 @@ import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 import { seoPages } from '../src/lib/seoContent.js'
 import { homepageSeo } from '../src/lib/homeSeo.js'
+import { legalDocs, legalInfo } from '../src/lib/legalContent.js'
 
 const SITE = 'https://ugcarabie.com'
 const OUT = path.resolve('dist')
@@ -166,13 +167,25 @@ for(const c of campaigns){
  about:{'@type':'CreativeWork',name:c.title,description:short(c.description||'',400)}}})
 }
 
+// Legal pages are full HTML documents for direct visitors even without JavaScript.
+// Keep noindex until the registered legal operator and retention details are confirmed.
+for(const [pathname,doc] of [['/terms',legalDocs.terms],['/privacy',legalDocs.privacy]]){
+ const body='<p>'+esc(doc.subtitle)+'</p><p>آخر مراجعة: '+esc(legalInfo.updated)+'</p>'+
+ '<section><h2>جهة التطوير: Viva Media Creative — VMC Labs</h2><p>طُوّرت UGC Arabie بواسطة Viva Media Creative ضمن VMC Labs. لا تعني صفة التطوير تلقائياً صفة المشغّل القانوني أو المسؤول عن البيانات.</p>'+
+ list([{href:legalInfo.developerUrl,title:'VMC Labs — مشاريع Viva Media Creative'}])+'</section>'+
+ '<section><h2>معلومات قانونية تحتاج استكمالاً</h2><p>'+esc(doc.alert)+'</p></section>'+
+ doc.sections.map(section=>'<section><h2>'+esc(section.heading)+'</h2>'+
+ section.paragraphs.map(p=>'<p>'+esc(p)+'</p>').join('')+
+ (section.links?.length?list(section.links.map(l=>({href:l.href,title:l.label}))):'')+'</section>').join('')
+ await page(pathname,{title:doc.title+' | UGC Arabie',description:doc.summary,heading:doc.title,body,index:false})
+}
+
 // These routes are usable and return HTTP 200, but should never be indexed.
 for(const [pathname,heading] of [
  ['/register','إنشاء حساب'],['/login','تسجيل الدخول'],['/dashboard','لوحة التحكم'],
  ['/dashboard/profile','الملف الشخصي'],['/dashboard/campaigns/new','حملة جديدة'],
  ['/messages','الرسائل الخاصة'],['/support','مراسلات الإدارة'],
- ['/admin','إدارة المنصة'],['/terms','شروط الاستخدام — مسودة'],
- ['/privacy','سياسة الخصوصية — مسودة']
+ ['/admin','إدارة المنصة']
 ]){
  await page(pathname,{title:heading+' | UGC Arabie',description:heading+' على منصة UGC Arabie',heading,index:false})
 }
