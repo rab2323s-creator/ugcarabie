@@ -9,6 +9,7 @@ import { createClient } from '@supabase/supabase-js'
 import { seoPages } from '../src/lib/seoContent.js'
 import { homepageSeo } from '../src/lib/homeSeo.js'
 import { legalDocs, legalInfo } from '../src/lib/legalContent.js'
+import { managedCampaigns, campaignInquiryLink } from '../src/lib/managedCampaigns.js'
 
 const SITE = 'https://ugcarabie.com'
 const OUT = path.resolve('dist')
@@ -152,6 +153,22 @@ for(const c of creators){
  updatedAt:p.updated_at||c.created_at,
  structured:{'@type':'ProfilePage',url:url(pathname),name:p.display_name||'ملف صانع محتوى',inLanguage:'ar',mainEntity:person},
  image:p.avatar_url})
+}
+// Managed opportunities: dedicated HTTP 200 pages with a real contact pathway.
+for(const c of managedCampaigns){
+ const pathname='/campaigns/'+c.id
+ const body='<h2>تفاصيل فرصة التعاون</h2><p>'+esc(c.description)+'</p>'+
+ '<p>المجال: '+esc(c.category)+' — البلد: '+esc(c.country)+'</p>'+
+ '<p>الميزانية المعلنة: '+esc(c.budget_min)+'–'+esc(c.budget_max)+' دولار أمريكي</p>'+
+ '<p>المطلوب: '+esc(c.deliverables)+'</p>'+
+ '<h2>التواصل والتقديم</h2><p>للتقديم أرسل اسمك وبلدك وروابط أعمالك إلى فريق UGC Arabie.</p>'+
+ list([{href:campaignInquiryLink(c),title:'تواصل معنا للتقديم: info@ugcarabie.com'}])
+ await page(pathname,{
+  title:short(c.title+' | فرصة UGC للتقديم | UGC Arabie',95),
+  description:short(c.title+' — فرصة UGC في '+c.country+'. '+c.description+' تواصل مع UGC Arabie للتقديم.'),
+  heading:c.title,body,
+  structured:{'@type':'WebPage',name:c.title,url:url(pathname),inLanguage:'ar',about:{'@type':'CreativeWork',name:c.title}}
+ })
 }
 for(const c of campaigns){
  const pathname='/campaigns/'+c.id
