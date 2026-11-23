@@ -167,13 +167,11 @@ for(const c of campaigns){
  about:{'@type':'CreativeWork',name:c.title,description:short(c.description||'',400)}}})
 }
 
-// Legal pages are full HTML documents for direct visitors even without JavaScript.
-// Keep noindex until the registered legal operator and retention details are confirmed.
+// Render the same concise legal copy in direct-request HTML.
 for(const [pathname,doc] of [['/terms',legalDocs.terms],['/privacy',legalDocs.privacy]]){
  const body='<p>'+esc(doc.subtitle)+'</p><p>آخر مراجعة: '+esc(legalInfo.updated)+'</p>'+
- '<section><h2>جهة التطوير: Viva Media Creative — VMC Labs</h2><p>طُوّرت UGC Arabie بواسطة Viva Media Creative ضمن VMC Labs. لا تعني صفة التطوير تلقائياً صفة المشغّل القانوني أو المسؤول عن البيانات.</p>'+
- list([{href:legalInfo.developerUrl,title:'VMC Labs — مشاريع Viva Media Creative'}])+'</section>'+
- '<section><h2>معلومات قانونية تحتاج استكمالاً</h2><p>'+esc(doc.alert)+'</p></section>'+
+ '<section><h2>جهة تطوير المنصة</h2><p>تم تطوير منصة UGC Arabie بواسطة Viva Media Creative.</p>'+
+ list([{href:legalInfo.developerUrl,title:'Viva Media Creative'}])+'</section>'+
  doc.sections.map(section=>'<section><h2>'+esc(section.heading)+'</h2>'+
  section.paragraphs.map(p=>'<p>'+esc(p)+'</p>').join('')+
  (section.links?.length?list(section.links.map(l=>({href:l.href,title:l.label}))):'')+'</section>').join('')
