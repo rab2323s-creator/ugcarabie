@@ -15,7 +15,7 @@ function BlogImage({article,large=false}){
   {broken&&<div className="blog-image-placeholder" aria-label="مساحة صورة المقال — تُضاف الصورة الأصلية قريباً"><span className="blog-image-symbol"><ImageIcon size={26}/></span><span>UGC Arabie <small>مجلة الإبداع</small></span></div>}
  </div>
 }
-function BlogCard({article,featured=false}){
+export function BlogCard({article,featured=false}){
  const category=blogCategory(article.category)
  return <article className={'blog-post-card '+(featured?'blog-post-featured':'')}>
   <Link to={blogPath(article)} className="blog-post-image-link" aria-label={'اقرأ '+article.title}><BlogImage article={article}/></Link>
