@@ -6,6 +6,8 @@ import { CreatorCard,CampaignCard } from '../components/Cards'
 import { DemoNotice,SectionHeading } from '../components/Layout'
 import {homepageSeo} from '../lib/homeSeo'
 import {managedCampaigns} from '../lib/managedCampaigns'
+import {blogArticles} from '../lib/blogContent'
+import {BlogCard} from './Blog'
 
 export default function Home(){
  const [tab,setTab]=useState('creators'),[query,setQuery]=useState(''),[creators,setCreators]=useState([]),[campaigns,setCampaigns]=useState([]),navigate=useNavigate()
@@ -36,6 +38,7 @@ export default function Home(){
   <Link to="/for-creators" className="seo-home-card"><Camera size={25}/><h3>تبحث عن فرص عمل UGC؟</h3><p>كيف تبني بورتفوليو وتتقدم لحملات العلامات التجارية.</p><span>فرص عمل UGC للمبدعين <ArrowLeft size={16}/></span></Link>
   <Link to="/what-is-ugc" className="seo-home-card"><Video size={25}/><h3>ما هو UGC وما الفرق عن المؤثرين؟</h3><p>شرح المعنى والأمثلة وحقوق استخدام الفيديو في الإعلانات.</p><span>اقرأ دليل محتوى UGC <ArrowLeft size={16}/></span></Link>
  </div></div></section>
+ <section className="section blog-home-section"><div className="container"><SectionHeading eyebrow="من مدونة UGC Arabie" title={<>معرفة تصنع <span className="accent">فرصاً أفضل</span></>} description="أدلة عربية أصلية لصنّاع المحتوى والشركات؛ من البورتفوليو إلى اختيار المبدع وتسعير الفيديو." action={<Link className="inline-action" to="/blog">جميع المقالات <ArrowLeft size={18}/></Link>}/><div className="blog-post-grid">{[blogArticles[0],blogArticles[2],blogArticles[4]].map(article=><BlogCard key={article.slug} article={article}/>)}</div></div></section>
  <section className="cta-section"><div className="container"><div className="cta-box"><span className="cta-decoration deco1">✳</span><span className="cta-decoration deco2">✦</span><div className="eyebrow">جاهز للخطوة الجاية؟</div><h2>خلّي المحتوى يفتحلك <span>أبواب جديدة.</span></h2><p>سواء كنت صانع محتوى أو علامة تجارية، مكانك معنا.</p><div className="cta-actions"><Link to="/register?role=creator" className="btn btn-white btn-large">سجّل كمبدع <ArrowLeft size={18}/></Link><Link to="/register?role=company" className="btn btn-outline-white btn-large">سجّل كشركة</Link></div></div></div></section>
  </>
 }
