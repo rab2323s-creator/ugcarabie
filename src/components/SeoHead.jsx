@@ -3,6 +3,7 @@ import {useLocation} from 'react-router-dom'
 import {supabase} from '../lib/supabase'
 import {seoPages} from '../lib/seoContent'
 import {homepageSeo} from '../lib/homeSeo'
+import {managedCampaigns} from '../lib/managedCampaigns'
 
 const SITE='https://ugcarabie.com'
 const org={'@type':'Organization',name:'UGC Arabie',url:SITE+'/'}
@@ -65,6 +66,13 @@ export default function SeoHead(){
   if(seoPages[path]){
    const entry=seoPages[path]
    apply(path,{title:entry.title,description:entry.description,structured:{'@type':'WebPage',name:entry.title,url:canonical(path),description:entry.description,inLanguage:'ar'}})
+   return()=>{active=false}
+  }
+  const managed=managedCampaigns.find(c=>path==='/campaigns/'+c.id)
+  if(managed){
+   const title=short(managed.title+' | فرصة UGC للتقديم | UGC Arabie',95)
+   const description=short(managed.title+' — فرصة UGC في '+managed.country+'. '+managed.description+' تواصل مع UGC Arabie للتقديم.')
+   apply(path,{title,description,structured:{'@type':'WebPage',name:managed.title,url:canonical(path),inLanguage:'ar'}})
    return()=>{active=false}
   }
   if(privateTitles[path]){
