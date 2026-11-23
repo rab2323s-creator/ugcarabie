@@ -50,6 +50,12 @@ jobs:
           test -f dist/campaigns/ugc-tech-ae/index.html
           test -f dist/campaigns/ugc-cafe-eg/index.html
           grep -q 'info@ugcarabie.com' dist/campaigns/ugc-beauty-sa/index.html
+          grep -q '40–70' dist/campaigns/ugc-beauty-sa/index.html
+          grep -q 'تجربة المنتج وعرض طريقة استخدامه بوضوح' dist/campaigns/ugc-beauty-sa/index.html
+          grep -q '40–60' dist/campaigns/ugc-tech-ae/index.html
+          grep -q 'تجربة المنتج بشكل عملي' dist/campaigns/ugc-tech-ae/index.html
+          grep -q '20–40' dist/campaigns/ugc-cafe-eg/index.html
+          grep -q 'يوفر المقهى الضيافة أثناء التصوير' dist/campaigns/ugc-cafe-eg/index.html
           grep -q 'https://ugcarabie.com/campaigns/ugc-beauty-sa/' dist/sitemap.xml
           grep -q 'https://ugcarabie.com/campaigns/ugc-tech-ae/' dist/sitemap.xml
           grep -q 'https://ugcarabie.com/campaigns/ugc-cafe-eg/' dist/sitemap.xml
