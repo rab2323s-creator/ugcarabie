@@ -157,10 +157,12 @@ for(const c of creators){
 // Managed opportunities: dedicated HTTP 200 pages with a real contact pathway.
 for(const c of managedCampaigns){
  const pathname='/campaigns/'+c.id
- const body='<h2>تفاصيل فرصة التعاون</h2><p>'+esc(c.description)+'</p>'+
- '<p>المجال: '+esc(c.category)+' — البلد: '+esc(c.country)+'</p>'+
- '<p>الميزانية المعلنة: '+esc(c.budget_min)+'–'+esc(c.budget_max)+' دولار أمريكي</p>'+
- '<p>المطلوب: '+esc(c.deliverables)+'</p>'+
+ const body='<h2>عن هذه الحملة</h2><p>'+esc(c.description)+'</p>'+
+ (c.additionalDescription?'<p>'+esc(c.additionalDescription)+'</p>':'')+
+ '<h2>المطلوب</h2><ul>'+c.requirements.map(item=>'<li>'+esc(item)+'</li>').join('')+'</ul>'+
+ '<h2>الميزانية</h2><p>'+esc(c.budgetDescription)+'</p>'+
+ (c.closing?'<p>'+esc(c.closing)+'</p>':'')+
+ (c.note?'<p><strong>ملاحظة:</strong> '+esc(c.note)+'</p>':'')+
  '<h2>التواصل والتقديم</h2><p>للتقديم أرسل اسمك وبلدك وروابط أعمالك إلى فريق UGC Arabie.</p>'+
  list([{href:campaignInquiryLink(c),title:'تواصل معنا للتقديم: info@ugcarabie.com'}])
  await page(pathname,{
