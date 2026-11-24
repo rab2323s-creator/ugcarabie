@@ -12,6 +12,7 @@ import { legalDocs, legalInfo } from '../src/lib/legalContent.js'
 import { managedCampaigns, campaignInquiryLink } from '../src/lib/managedCampaigns.js'
 import { blogArticles, blogInfo, blogPath } from '../src/lib/blogContent.js'
 import { toolsCatalog,toolPath,toolsUpdated } from '../src/lib/toolsCatalog.js'
+import {resourceGroups,campaignResources,publicHref} from '../src/lib/internalResources.js'
 
 const SITE = 'https://ugcarabie.com'
 const OUT = path.resolve('dist')
@@ -27,7 +28,8 @@ const safeSlug = s => typeof s==='string' && /^[a-z0-9-]{3,100}$/i.test(s)
 const safeUuid = s => typeof s==='string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
 const url = pathname => SITE+(pathname==='/'?'/':pathname.replace(/\/$/,'')+'/')
 const json = obj => JSON.stringify(obj).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026')
-const list = links => '<ul>'+links.map(x=>'<li><a href="'+esc(x.href)+'">'+esc(x.title)+'</a></li>').join('')+'</ul>'
+const list = links => '<ul>'+links.map(x=>'<li><a href="'+esc(publicHref(x.href))+'">'+esc(x.title)+'</a></li>').join('')+'</ul>'
+const contextual=group=>'<section class="seo-prerender-resources"><h2>'+esc(group.title)+'</h2><p>'+esc(group.intro)+'</p>'+list(group.items.map(x=>({href:x.href,title:x.label})))+'</section>'
 const org = {'@type':'Organization','@id':SITE+'/#organization',name:'UGC Arabie',url:SITE+'/'}
 const website = {'@type':'WebSite','@id':SITE+'/#website',name:'UGC Arabie',url:SITE+'/',inLanguage:'ar'}
 const intro = 'UGC Arabie منصة عربية تربط صنّاع محتوى UGC بالعلامات التجارية والشركات لاكتشاف المبدعين ونشر فرص التعاون.'
@@ -92,7 +94,7 @@ await page('/',{
  title:homepageSeo.title,
  description:homepageSeo.description,
  heading:homepageSeo.heading,
- body:'<h2>ابحث عن مبدعين وفرص UGC</h2>'+list([{href:'/creators/',title:'اكتشف صناع محتوى UGC عرب'},{href:'/campaigns/',title:'تصفح حملات وفرص UGC'},{href:'/how-it-works/',title:'كيف تعمل المنصة؟'},{href:'/blog/',title:'مدونة UGC Arabie — أدلة المبدعين والشركات'},{href:'/tools/',title:'أدوات UGC المجانية' },...toolsCatalog.map(t=>({href:toolPath(t),title:t.title}))]),
+ body:'<h2>ابحث عن مبدعين وفرص UGC</h2>'+list([{href:'/creators/',title:'اكتشف صناع محتوى UGC عرب'},{href:'/campaigns/',title:'تصفح حملات وفرص UGC'},{href:'/how-it-works/',title:'كيف تعمل المنصة؟'},{href:'/for-brands/',title:'توظيف صناع محتوى UGC للشركات'},{href:'/for-creators/',title:'فرص عمل UGC للمبدعين'},{href:'/what-is-ugc/',title:'ما هو UGC؟'},{href:'/blog/',title:'مدونة UGC Arabie — أدلة المبدعين والشركات'},{href:'/tools/',title:'أدوات UGC المجانية' },...toolsCatalog.map(t=>({href:toolPath(t),title:t.title})),...blogArticles.map(a=>({href:blogPath(a)+'/',title:a.title}))]),
  structured:{'@type':'WebPage','@id':SITE+'/#home',name:'UGC Arabie — منصة صناع محتوى UGC العرب',url:SITE+'/',inLanguage:'ar',isPartOf:{'@id':website['@id']},about:org}
 })
 indexable.push({loc:SITE+'/'})
@@ -100,21 +102,21 @@ await page('/creators',{
  title:'صناع محتوى UGC عرب | اكتشف مبدعين لعلامتك التجارية | UGC Arabie',
  description:'ابحث عن صناع محتوى UGC عرب حسب البلد والتخصص، واستعرض ملفاتهم وروابط أعمالهم لاختيار المبدع المناسب لحملتك الإعلانية.',
  heading:'اكتشف صناع محتوى UGC العرب',
- body:'<h2>مبدعون معتمدون</h2>'+(creators.length?list(creators.slice(0,100).map(c=>({href:'/creator/'+c.profile.slug+'/',title:c.profile.display_name+' — '+(c.headline||'صانع محتوى UGC')}))):'<p>ستظهر هنا حسابات صنّاع المحتوى المعتمدين بعد التسجيل والمراجعة.</p>'),
+ body:'<h2>مبدعون معتمدون</h2>'+(creators.length?list(creators.map(c=>({href:'/creator/'+c.profile.slug+'/',title:c.profile.display_name+' — '+(c.headline||'صانع محتوى UGC')}))):'<p>ستظهر هنا حسابات صنّاع المحتوى المعتمدين بعد التسجيل والمراجعة.</p>')+contextual(resourceGroups.directory),
  structured:{'@type':'CollectionPage',name:'دليل صناع محتوى UGC العرب',url:url('/creators'),inLanguage:'ar'}
 })
 await page('/campaigns',{
  title:'فرص عمل وحملات UGC للمبدعين العرب | UGC Arabie',
  description:'تصفّح فرص وحملات إنشاء محتوى UGC للعلامات التجارية، واعرف التخصصات والميزانيات والمتطلبات، وقدّم على التعاون المناسب لك.',
  heading:'حملات UGC وفرص التعاون للمبدعين',
- body:'<h2>فرص التعاون المتاحة</h2>'+list([...managedCampaigns.map(c=>({href:'/campaigns/'+c.id+'/',title:c.title})),...campaigns.slice(0,100).map(c=>({href:'/campaigns/'+c.id+'/',title:c.title}))]),
+ body:'<h2>فرص التعاون المتاحة</h2>'+list([...managedCampaigns.map(c=>({href:'/campaigns/'+c.id+'/',title:c.title})),...campaigns.map(c=>({href:'/campaigns/'+c.id+'/',title:c.title}))])+contextual(resourceGroups.campaigns),
  structured:{'@type':'CollectionPage',name:'حملات وفرص UGC',url:url('/campaigns'),inLanguage:'ar'}
 })
 await page('/how-it-works',{
  title:'كيف تعمل منصة UGC Arabie؟ دليل المبدعين والشركات',
  description:'دليل استخدام منصة UGC Arabie: إنشاء بروفايل صانع محتوى، الموافقة عليه، البحث عن الحملات، نشر حملات الشركات والتواصل بعد قبول الطلب.',
  heading:'كيف تعمل منصة UGC Arabie؟',
- body:'<h2>لصانع المحتوى</h2><p>سجّل، وأضف نبذة وروابط أعمالك، وانتظر اعتماد الملف، ثم تقدّم على الحملات المناسبة.</p><h2>للشركات</h2><p>سجّل شركتك، واكتشف المبدعين حسب تخصصهم وبلدهم، وانشر حملة وراجع طلبات التعاون.</p>',
+ body:'<h2>لصانع المحتوى</h2><p>سجّل، وأضف نبذة وروابط أعمالك، وانتظر اعتماد الملف، ثم تقدّم على الحملات المناسبة.</p><h2>للشركات</h2><p>سجّل شركتك، واكتشف المبدعين حسب تخصصهم وبلدهم، وانشر حملة وراجع طلبات التعاون.</p>'+contextual(resourceGroups.howCreator)+contextual(resourceGroups.howBrand),
  structured:{'@type':'AboutPage',name:'كيف تعمل منصة UGC Arabie؟',url:url('/how-it-works'),inLanguage:'ar'}
 })
 
@@ -160,7 +162,7 @@ for(const c of creators){
  ((c.languages||[]).length?'<h2>اللغات</h2><p>'+esc(c.languages.join('، '))+'</p>':'')
  const person={'@type':'Person',name:p.display_name||'صانع محتوى UGC',url:url(pathname),description:short(p.bio||c.headline||'صانع محتوى UGC'),...(p.country?{homeLocation:{'@type':'Country',name:p.country}}:{}),...(p.avatar_url&&/^https:\/\//.test(p.avatar_url)?{image:p.avatar_url}:{})}
  await page(pathname,{title:short((p.display_name||'صانع محتوى')+' | صانع محتوى UGC'+(p.country?' في '+p.country:'')+' | UGC Arabie',95),
- description,heading:(p.display_name||'صانع محتوى UGC')+' — ملف صانع محتوى UGC',body:details,
+ description,heading:(p.display_name||'صانع محتوى UGC')+' — ملف صانع محتوى UGC',body:details+contextual(resourceGroups.creatorDetail),
  updatedAt:p.updated_at||c.created_at,
  structured:{'@type':'ProfilePage',url:url(pathname),name:p.display_name||'ملف صانع محتوى',inLanguage:'ar',mainEntity:person},
  image:p.avatar_url})
@@ -175,7 +177,7 @@ for(const c of managedCampaigns){
  (c.closing?'<p>'+esc(c.closing)+'</p>':'')+
  (c.note?'<p><strong>ملاحظة:</strong> '+esc(c.note)+'</p>':'')+
  '<h2>التواصل والتقديم</h2><p>للتقديم أرسل اسمك وبلدك وروابط أعمالك إلى فريق UGC Arabie.</p>'+
- list([{href:campaignInquiryLink(c),title:'تواصل معنا للتقديم: info@ugcarabie.com'}])
+ list([{href:campaignInquiryLink(c),title:'تواصل معنا للتقديم: info@ugcarabie.com'}])+contextual(campaignResources(c.country))+list([{href:'/campaigns/',title:'تصفح جميع فرص UGC'}])
  await page(pathname,{
   title:short(c.title+' | فرصة UGC للتقديم | UGC Arabie',95),
   description:short(c.title+' — فرصة UGC في '+c.country+'. '+c.description+' تواصل مع UGC Arabie للتقديم.'),
@@ -192,7 +194,7 @@ for(const c of campaigns){
  (c.deliverables?'<h2>المخرجات المطلوبة</h2><p>'+esc(c.deliverables)+'</p>':'')+
  (c.deadline?'<h2>آخر موعد للتقديم</h2><p>'+esc(c.deadline)+'</p>':'')
  await page(pathname,{title:short(c.title+' | حملة وفرصة تعاون UGC | UGC Arabie',95),description,
- heading:c.title,body:details,updatedAt:c.updated_at||c.created_at,
+ heading:c.title,body:details+contextual(campaignResources(c.country))+list([{href:'/campaigns/',title:'تصفح جميع فرص UGC'}]),updatedAt:c.updated_at||c.created_at,
  structured:{'@type':'WebPage',name:c.title,url:url(pathname),inLanguage:'ar',datePublished:c.created_at,
  about:{'@type':'CreativeWork',name:c.title,description:short(c.description||'',400)}}})
 }

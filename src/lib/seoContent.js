@@ -1,3 +1,4 @@
+import {resources as r,publicHref} from './internalResources.js'
 // Content is shared between the visible React pages and the static HTML SEO build.
 // Keep every factual claim aligned with the marketplace's actual capabilities.
 export const seoPages = {
@@ -111,4 +112,16 @@ export const seoPages = {
   ],
   related:[{label:'توظيف صانع محتوى UGC للشركات',href:'/for-brands'},{label:'فرص عمل UGC للمبدعين',href:'/for-creators'},{label:'دليل صناع محتوى UGC العرب',href:'/creators'}]
  }
+}
+
+// Match each recommendation to the relevant explanation, not a generic link dump.
+const context={
+ '/for-brands':[[r.choose,r.evaluate],[r.calculator],[r.compare,r.strategy],[r.price]],
+ '/for-creators':[[r.start,r.plan],[r.portfolio,r.builder],[r.price,r.income],[r.jobs]],
+ '/what-is-ugc':[[r.start],[r.compare,r.strategy],[r.portfolio],[r.plan],[r.price,r.calculator],[r.choose,r.jobs]]
+}
+for(const [route,entry] of Object.entries(seoPages)){
+ entry.sections.forEach((section,i)=>{section.links=[...(section.links||[]),...(context[route][i]||[])].map(x=>({...x,href:publicHref(x.href)}))})
+ entry.actions=entry.actions.map(x=>({...x,href:publicHref(x.href)}))
+ entry.related=[...entry.related.map(x=>({...x,href:publicHref(x.href)})),{label:'استكشف أدوات UGC المجانية',href:'/tools/'}]
 }

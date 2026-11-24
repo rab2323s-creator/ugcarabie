@@ -55,8 +55,29 @@ try {
           if(!html.includes('BlogPosting') || !html.includes('BreadcrumbList') || !html.includes('rel="canonical"')) throw new Error('Blog HTML metadata missing: '+slug);
           if(!html.includes('<h2>') || !html.includes('meta name="description"')) throw new Error('Blog content missing: '+slug);
         }
-        const sitemap = await page.request.get(new URL('/sitemap.xml',siteUrl).toString());
-        if (sitemap.status() !== 200 || !(await sitemap.text()).includes('<urlset')) throw new Error('SEO sitemap unavailable');
+        const sitemap = await page.request.get(new URL('/sitemap.xml',siteUrl).toString(), {maxRedirects:0});
+        const xml=await sitemap.text();
+        if (sitemap.status() !== 200 || !xml.includes('<urlset')) throw new Error('SEO sitemap unavailable');
+        // Verify the actual canonical URLs, not just a final 200 after redirects.
+        if(test.name==='desktop'){
+          const urls=[...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(m=>m[1].replace(/&amp;/g,'&'));
+          if(!urls.length)throw new Error('Empty sitemap');
+          for(const url of urls){
+            const result=await page.request.get(url,{maxRedirects:0,timeout:30000});
+            if(result.status()!==200)throw new Error('Sitemap URL not direct HTTP 200: '+url+' '+result.status()+' location: '+(result.headers().location||''));
+            const html=await result.text(),canonical=html.match(/<link\b[^>]*rel="canonical"[^>]*href="([^"]+)"/i)?.[1];
+            if(!canonical||new URL(canonical).href!==new URL(url).href)throw new Error('Canonical mismatch: '+url);
+            if(/<meta\b[^>]*name="robots"[^>]*content="[^"]*noindex/i.test(html))throw new Error('Sitemap URL marked noindex: '+url);
+          }
+          const source=new URL('/for-brands',siteUrl).toString();
+          const target=new URL('/for-brands/',siteUrl).toString();
+          const first=await page.request.get(source,{maxRedirects:0,timeout:30000});
+          if(first.status()>=300&&first.status()<400){
+            const location=first.headers().location;
+            if(!location||new URL(location,source).href!==target)throw new Error('Unexpected for-brands redirect: '+first.status()+' '+location);
+          }else if(first.status()!==200)throw new Error('Noncanonical for-brands HTTP '+first.status());
+          console.log('PASS: '+urls.length+' canonical sitemap URLs direct HTTP 200; /for-brands status '+first.status());
+        }
         const robots = await page.request.get(new URL('/robots.txt',siteUrl).toString());
         if (robots.status() !== 200 || !(await robots.text()).includes('Sitemap:')) throw new Error('SEO robots unavailable');
         for (const slug of ['terms','privacy']) {

@@ -2,6 +2,7 @@ import React from 'react'
 import {Link,useLocation} from 'react-router-dom'
 import {ArrowLeft,ArrowUpLeft,CheckCircle2,Lightbulb,Search,BriefcaseBusiness,BookOpen} from 'lucide-react'
 import {seoPages} from '../lib/seoContent'
+import {ResourceLink} from '../components/Resources'
 
 export default function SearchLanding(){
  const {pathname}=useLocation()
@@ -24,7 +25,7 @@ export default function SearchLanding(){
      {section.paragraphs?.map((p,j)=><p key={j}>{p}</p>)}
      {section.items?.length>0&&<div className="seo-item-grid">{section.items.map((item,j)=><div className="seo-info-item" key={j}><h3><CheckCircle2 size={18}/>{item.heading}</h3><p>{item.text}</p></div>)}</div>}
      {section.bullets?.length>0&&<ul className="seo-checklist">{section.bullets.map((point,j)=><li key={j}>{point}</li>)}</ul>}
-     {section.links?.length>0&&<div className="seo-context-links">{section.links.map(a=><Link to={a.href} key={a.href}>{a.label}<ArrowUpLeft size={15}/></Link>)}</div>}
+     {section.links?.length>0&&<div className="seo-context-links">{section.links.map(a=><ResourceLink href={a.href} key={a.href} className="seo-context-resource"><span>{a.type&&<small>{a.type}</small>}<strong>{a.label}</strong>{a.description&&<span className="seo-context-description">{a.description}</span>}</span><ArrowUpLeft size={17}/></ResourceLink>)}</div>}
     </section>)}
     <section className="seo-content-section seo-faq" aria-labelledby="seo-faq-title">
      <h2 id="seo-faq-title">أسئلة شائعة</h2>
@@ -36,12 +37,12 @@ export default function SearchLanding(){
      <Lightbulb size={23}/>
      <h2>الخطوة التالية</h2>
      <p>اختَر المسار الأقرب لاحتياجك واطّلع على الملفات أو الحملات المتاحة.</p>
-     {page.actions.map(a=><Link key={a.href} to={a.href}>{a.label}<ArrowUpLeft size={16}/></Link>)}
+     {page.actions.map(a=><ResourceLink key={a.href} href={a.href}>{a.label}<ArrowUpLeft size={16}/></ResourceLink>)}
     </div>
     <div className="seo-aside-card">
      <BookOpen size={23}/>
      <h2>اقرأ أيضاً</h2>
-     {page.related.map(a=><Link key={a.href} to={a.href}>{a.label}<ArrowUpLeft size={16}/></Link>)}
+     {page.related.map(a=><ResourceLink key={a.href} href={a.href}>{a.label}<ArrowUpLeft size={16}/></ResourceLink>)}
     </div>
    </aside>
   </div>
