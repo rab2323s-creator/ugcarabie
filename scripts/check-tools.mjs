@@ -29,4 +29,4 @@ for(const t of toolsCatalog){
  }
 }
 new vm.Script(await read('/tools/filter.js'))
-console.log('PASS: 5 standalone indexable tools pages, sitemap, assets, downloads and script syntax')
+console.log('PASS: 6 standalone indexable tools pages, sitemap, assets, downloads and script syntax')
