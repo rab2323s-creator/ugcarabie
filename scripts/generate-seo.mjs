@@ -11,6 +11,7 @@ import { homepageSeo } from '../src/lib/homeSeo.js'
 import { legalDocs, legalInfo } from '../src/lib/legalContent.js'
 import { managedCampaigns, campaignInquiryLink } from '../src/lib/managedCampaigns.js'
 import { blogArticles, blogInfo, blogPath } from '../src/lib/blogContent.js'
+import { toolsCatalog,toolPath,toolsUpdated } from '../src/lib/toolsCatalog.js'
 
 const SITE = 'https://ugcarabie.com'
 const OUT = path.resolve('dist')
@@ -91,7 +92,7 @@ await page('/',{
  title:homepageSeo.title,
  description:homepageSeo.description,
  heading:homepageSeo.heading,
- body:'<h2>ابحث عن مبدعين وفرص UGC</h2>'+list([{href:'/creators/',title:'اكتشف صناع محتوى UGC عرب'},{href:'/campaigns/',title:'تصفح حملات وفرص UGC'},{href:'/how-it-works/',title:'كيف تعمل المنصة؟'},{href:'/blog/',title:'مدونة UGC Arabie — أدلة المبدعين والشركات'}]),
+ body:'<h2>ابحث عن مبدعين وفرص UGC</h2>'+list([{href:'/creators/',title:'اكتشف صناع محتوى UGC عرب'},{href:'/campaigns/',title:'تصفح حملات وفرص UGC'},{href:'/how-it-works/',title:'كيف تعمل المنصة؟'},{href:'/blog/',title:'مدونة UGC Arabie — أدلة المبدعين والشركات'},{href:'/tools/',title:'أدوات UGC المجانية' },...toolsCatalog.map(t=>({href:toolPath(t),title:t.title}))]),
  structured:{'@type':'WebPage','@id':SITE+'/#home',name:'UGC Arabie — منصة صناع محتوى UGC العرب',url:SITE+'/',inLanguage:'ar',isPartOf:{'@id':website['@id']},about:org}
 })
 indexable.push({loc:SITE+'/'})
@@ -140,6 +141,8 @@ for(const [pathname,content] of Object.entries(seoPages)){
 
 // Standalone source HTML is stored under blog/, not generated from React.
 // The publish-static-blog step copies those exact files to dist/ after this sitemap is written.
+indexable.push({loc:url('/tools'),lastmod:toolsUpdated})
+for(const t of toolsCatalog)indexable.push({loc:SITE+toolPath(t),lastmod:toolsUpdated})
 indexable.push({loc:url('/blog'),lastmod:blogInfo.updated})
 for(const article of blogArticles){
  indexable.push({loc:url(blogPath(article)),lastmod:article.updated})

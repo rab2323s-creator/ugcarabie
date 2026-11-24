@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build && node scripts/generate-seo.mjs && node scripts/publish-static-blog.mjs",
+    "build": "vite build && node scripts/generate-seo.mjs && node scripts/publish-static-blog.mjs && node scripts/publish-tools.mjs && node scripts/check-tools.mjs",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
