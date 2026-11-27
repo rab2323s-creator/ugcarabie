@@ -55,7 +55,7 @@ for(const article of articles){
   const post=json['@graph'].find(x=>x['@type']==='BlogPosting')
   const webpage=json['@graph'].find(x=>x['@type']==='WebPage')
   if(!post||!webpage)throw new Error('Invalid article schema: '+article.slug)
-  const image={'@type':'ImageObject','@id':SITE+'/blog/'+article.slug+'/#primaryimage',url:imageUrl,contentUrl:imageUrl,caption:article.imageAlt}
+  const image={'@type':'ImageObject','@id':SITE+'/blog/'+article.slug+'/#primaryimage',url:imageUrl,contentUrl:imageUrl,caption:article.imageCaption||article.imageAlt,description:article.imageAlt,encodingFormat:'image/webp'}
   json['@graph'].push(image)
   post.image={'@id':image['@id']}
   webpage.primaryImageOfPage={'@id':image['@id']}
@@ -66,3 +66,26 @@ for(const article of articles){
  console.log('Static blog:',article.slug,ready?'image indexed':'image placeholder')
 }
 console.log('Published',articles.length,'standalone HTML blog articles to dist/blog/')
+
+// Register only verified, published article cover images in the existing sitemap.
+const sitemapFile=path.join(root,'dist','sitemap.xml')
+let sitemap=await fs.readFile(sitemapFile,'utf8')
+const xmlEscape=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+if(!sitemap.includes('xmlns:image='))sitemap=sitemap.replace('<urlset ','<urlset xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" ')
+let indexedImages=0
+for(const article of articles){
+ const ready=await fs.access(path.join(root,'dist',article.image.slice(1))).then(()=>true,()=>false)
+ if(!ready)continue
+ const loc='<loc>'+xmlEscape(SITE+'/blog/'+article.slug+'/')+'</loc>'
+ const entry='<image:image><image:loc>'+xmlEscape(SITE+article.image)+'</image:loc></image:image>'
+ let found=false
+ sitemap=sitemap.replace(/<url>[\s\S]*?<\/url>/g,block=>{
+  if(!block.includes(loc))return block
+  found=true
+  return block.includes(entry)?block:block.replace('</url>',entry+'</url>')
+ })
+ if(!found)throw new Error('Missing sitemap entry for blog image: '+article.slug)
+ indexedImages++
+}
+await fs.writeFile(sitemapFile,sitemap)
+console.log('Blog cover images in sitemap:',indexedImages)
