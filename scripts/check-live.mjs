@@ -26,7 +26,7 @@ try {
         if (exceptions.length) throw new Error('JavaScript error: ' + exceptions.join('; '));
         const app = await page.locator('#root').innerText();
         if (app.length < 300) throw new Error('React app rendered too little content: ' + app.length);
-        for (const route of ['register?role=creator', 'register?role=company', 'login', 'creators', 'campaigns', 'for-brands', 'for-creators', 'what-is-ugc', 'terms', 'privacy', 'blog', 'blog/كيف-تصبح-صانع-محتوى-UGC-بدون-متابعين', 'blog/أسعار-فيديوهات-UGC-في-السعودية']) {
+        for (const route of ['register?role=creator', 'register?role=company', 'login', 'creators', 'campaigns', 'for-brands', 'for-creators', 'what-is-ugc', 'terms', 'privacy', 'blog', 'blog/كيف-تصبح-صانع-محتوى-UGC-بدون-متابعين', 'blog/أسعار-فيديوهات-UGC-في-السعودية','blog/كيف-تصور-فيديو-UGC-احترافي-بالجوال-من-المنزل/']) {
           const target = new URL(route, siteUrl).toString();
           const routeResponse = await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30000 });
           if (routeResponse?.status() !== 200) throw new Error('SEO route ' + route + ' must return HTTP 200, got ' + routeResponse?.status());
@@ -35,6 +35,20 @@ try {
             if (await page.locator('#root').count()) throw new Error('Blog page should be standalone HTML, not React: ' + route);
           } else {
             await page.locator('#root').locator('h1').first().waitFor({ state: 'visible', timeout: 12000 });
+          }
+          if(route==='blog/كيف-تصور-فيديو-UGC-احترافي-بالجوال-من-المنزل/'){
+            if(await page.locator('h1').count()!==1)throw new Error('UGC shooting guide H1');
+            if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1))throw new Error('UGC shooting guide horizontal overflow');
+            await page.locator('#shoot-check input').first().check();
+            if(!((await page.locator('#shoot-score').innerText()).includes('1 من 10')))throw new Error('UGC checklist failed');
+            await page.locator('#shoot-reset').click();
+            await page.locator('#demo-next').click();
+            if(!((await page.locator('#demo-status').innerText()).includes('السياق')))throw new Error('UGC storyboard next failed');
+            await page.locator('#demo-prev').click();
+            const img=page.locator('.blog-image-large img');
+            await img.waitFor({state:'visible'});
+            if(!await img.evaluate(el=>el.complete&&el.naturalWidth>0))throw new Error('UGC cover missing');
+            await page.screenshot({path:'screenshots/ugc-shoot-'+test.name+'.png',fullPage:true});
           }
           if (exceptions.length) throw new Error('JS error on ' + route + ': ' + exceptions.join('; '));
         }
@@ -47,7 +61,7 @@ try {
           if (res.status() !== 200 || !html.includes('rel="canonical"') || !html.includes('application/ld+json')) throw new Error('SEO '+slug+' metadata or HTTP 200 missing');
           if (!html.includes('<h2>') || !html.includes('أسئلة شائعة')) throw new Error('SEO '+slug+' body not prerendered');
         }
-        for (const slug of ['كيف-تصبح-صانع-محتوى-UGC-بدون-متابعين','كيف-تختار-صانع-محتوى-UGC-لعلامتك','أسعار-فيديوهات-UGC-في-السعودية']) {
+        for (const slug of ['كيف-تصبح-صانع-محتوى-UGC-بدون-متابعين','كيف-تختار-صانع-محتوى-UGC-لعلامتك','أسعار-فيديوهات-UGC-في-السعودية','كيف-تصور-فيديو-UGC-احترافي-بالجوال-من-المنزل']) {
           const endpoint = new URL('/blog/'+slug+'/',siteUrl).toString();
           const result = await page.request.get(endpoint);
           const html = await result.text();
